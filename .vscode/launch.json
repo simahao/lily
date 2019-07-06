@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Jstack",
+            "request": "launch",
+            "mainClass": "main.java.com.dce.dev2.Jstack",
+            "projectName": "dev2_a322d07b"
+        }
+    ]
+}
