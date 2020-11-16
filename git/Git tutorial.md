@@ -41,6 +41,8 @@
     - [pathspec](#pathspec)
     - [Ignore file](#ignore-file)
     - [git commit lint](#git-commit-lint)
+    - [changelog](#changelog)
+      - [changelog workflow](#changelog-workflow)
     - [Command cheat](#command-cheat)
 
 ## How to config git
@@ -992,8 +994,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 执行以下语句
 
 ```shell
-cnpm install -D @commitlint/config-angular @commitlint/cli
-cnpm install -D husky
+npm install -D @commitlint/{config-angular,cli} husky
 # cd project directory
 # 进入本地仓库根目录
 echo "module.exports = {extends: ['@commitlint/config-angular']};" > commitlint.config.js
@@ -1005,6 +1006,50 @@ cat >>.huskyrc<<EOF
 }
 EOF
 ```
+
+### changelog
+
+利用conventional-changelog-cli组件实现changelog的自动编写
+
+```shell
+npm install -g conventional-changelog-cli
+npm init
+```
+
+edit package.json
+
+```json
+  "scripts": {
+    "genlog": "conventional-changelog -p angular -i CHANGELOG.md -s"
+  }
+```
+
+important options: conventional-changelog --help
+
+```text
+  Options
+    -i, --infile              Read the CHANGELOG from this file
+    -o, --outfile             Write the CHANGELOG to this file
+    -s, --same-file           Outputting to the infile so you don't need to specify the same file as outfile
+    -p, --preset              Name of the preset you want to use. Must be one of the following:
+                              angular, atom, codemirror, ember, eslint, express, jquery, jscs or jshint
+    -r, --release-count       How many releases to be generated from the latest
+                              If 0, the whole changelog will be regenerated and the outfile will be overwritten
+                              Default: 1
+    -u, --output-unreleased   Output unreleased changelog
+```
+
+#### changelog workflow
+
+- make changes
+- commit those changes
+- make sure CI to pass
+- upgrade package.json(version: "x.x.x")
+- run command: `npm run genlog` or `conventional-changelog -p angular -i CHANGELOG.md -s ...`
+- git commit --amend(commit package.json and CHANGELOG.md)
+- git push
+- git tag vX.X.X
+- git push origin vX.X.X
 
 ### Command cheat
 

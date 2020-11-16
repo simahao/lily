@@ -1,3 +1,12 @@
+# [1.1.0](https://github.com/simahao/lily/compare/v1.0.0...v1.1.0) (2020-11-16)
+
+
+### Features
+
+* add changelog tutorails ([8ab87e1](https://github.com/simahao/lily/commit/8ab87e1eee9027888f238e06a83bb8faae7cf3e6))
+
+
+
 # 1.0.0 (2020-11-16)
 
 
