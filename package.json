@@ -1,0 +1,31 @@
+{
+  "name": "lily",
+  "version": "1.0.0",
+  "description": "lily, a beautiful flowering plants.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "genlog": "conventional-changelog -p angular -i CHANGELOG.md -s"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simahao/lily.git"
+  },
+  "keywords": [
+    "git",
+    "java",
+    "db",
+    "tutorails"
+  ],
+  "author": "simahao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/simahao/lily/issues"
+  },
+  "homepage": "https://github.com/simahao/lily#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-angular": "^11.0.0",
+    "husky": "^4.3.0"
+  }
+}

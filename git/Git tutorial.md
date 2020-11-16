@@ -40,6 +40,7 @@
     - [back to future](#back-to-future)
     - [pathspec](#pathspec)
     - [Ignore file](#ignore-file)
+    - [git commit lint](#git-commit-lint)
     - [Command cheat](#command-cheat)
 
 ## How to config git
@@ -983,6 +984,27 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
   create ingore file
   git add .
   ```
+
+### git commit lint
+
+通过commitlint和husky两个组件上线commit的message hook
+
+执行以下语句
+
+```shell
+cnpm install -D @commitlint/config-angular @commitlint/cli
+cnpm install -D husky
+# cd project directory
+# 进入本地仓库根目录
+echo "module.exports = {extends: ['@commitlint/config-angular']};" > commitlint.config.js
+cat >>.huskyrc<<EOF
+{
+  "hooks": {
+    "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+  }
+}
+EOF
+```
 
 ### Command cheat
 
