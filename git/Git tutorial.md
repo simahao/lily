@@ -677,7 +677,7 @@ git push -u origin master
 
   - rebase and merge(--no-ff)
 
-    这种模式同rebase&merge相比，相同点是都会先进行rebase，不同点是进入原始项目的commit log会保留forked repository的commit log信息，在原始项目的commit log形成分叉。另外，同pull&merge相比，这种模式下分叉的commit hashid也会和原始提交的hashid不同，会产生一个新的hashid
+    这种模式同rebase&merge相比，相同点是都会先进行rebase，不同点是进入原始项目的commit log会保留forked repository的commit log信息，在原始项目的commit log形成分叉。另外，同pull&merge相比，这种模式下分叉的commit SHA-1也会和原始提交的SHA-1不同，会产生一个新的SHA-1
 
     ![rebase&merge-noff](png/pr-rebase&merge-noff.gif)
 
