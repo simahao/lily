@@ -136,7 +136,7 @@ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Crese
 
   ```git add [-A|-u|.]```
 
-- -A
+- -A|.
 
   文件的修改，文件的删除，文件的新建添加到暂存区
 
@@ -144,17 +144,12 @@ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Crese
 
   文件的修改、文件的删除添加到暂存区
 
-- .
-
-  文件的修改，文件的新建，添加到暂存区
-
   | flag  |  new  | update | delete |
   | :---: | :---: | :----: | :----: |
-  |  -A   |   √   |   √    |   √    |
+  | -A/.  |   √   |   √    |   √    |
   |  -u   |   ×   |   √    |   √    |
-  |   .   |   √   |   √    |   ×    |
 
-建议使用```git add -A```
+建议使用```git add .```
 
 ## How to use commit
 
