@@ -354,7 +354,7 @@ restore命令可以将working tree或者stage进行恢复
 
   有master分支和topic分支，当前在master分支上
 
-  ```sh
+  ```text
       A---B---C topic
      /
     D---E---F---G master
@@ -362,7 +362,7 @@ restore命令可以将working tree或者stage进行恢复
 
   如果想将topic上的A/B/C三次提交在master上重放，可以利用merge命令进行，合并后的状态可能是这样的，H是合并后的提交
 
-  ```sh
+  ```text
      A---B---C topic
     /         \
     D---E---F---G---H master
@@ -439,7 +439,7 @@ rebase的功能非常丰富，一般通过交互式方式进行```git rebase -i 
 
 分支合并货真变化基础分支，可以使用rebase的功能
 
-```sh
+```text
       A---B---C topic
       /
 D---E---F---G master
@@ -454,7 +454,7 @@ git rebase master topic
 
 结果变成
 
-```sh
+```text
               A'--B'--C' topic
               /
 D---E---F---G master
@@ -462,7 +462,7 @@ D---E---F---G master
 
 如果master和topic都包含相同的提交内容(A和A')
 
-```sh
+```text
       A---B---C topic
       /
 D---E---A'---F master
@@ -470,7 +470,7 @@ D---E---A'---F master
 
 结果变成
 
-```sh
+```text
                 B'---C' topic
               /
 D---E---A'---F master
@@ -478,7 +478,7 @@ D---E---A'---F master
 
 假设我们有如下提交结构
 
-```sh
+```text
 o---o---o---o---o  master
     \
       o---o---o---o---o  next
@@ -495,7 +495,7 @@ git rebase --onto master next topic
 
 结果变成
 
-```sh
+```text
 o---o---o---o---o  master
     |            \
     |             o'--o'--o'  topic
@@ -696,7 +696,7 @@ git push -u origin master
 
 有如下提交，A是最后产生的提交， 为了形象化，BC水平，DEF水平，GHIJ水平，其实代表的是分支提交，有先有后，但是从A节点的角度来看，但是B和C都是A的祖先，如何来表达B，又如何来表达C？git中用~表示一个提交的第n个祖先提交，^用来表示一个提交的第n个父提交（B是A的第一个父提交，C就是A的第二个父提交）
 
-```sh
+```text
 G   H   I   J
  \ /     \ /
   D   E   F
@@ -709,7 +709,7 @@ G   H   I   J
          A
 ```
 
-```sh
+```text
 A =      = A^0
 B = A^   = A^1     = A~1
 C = A^2  = A^2
@@ -772,7 +772,11 @@ J = F^2  = B^3^2   = A^^3^2
 
 ### Create tar that include changed file
 
-```git diff commitid HEAD --name-only | xargs -i echo '"{}"' | xargs tar zcf xxx.tar.gz```
+```sh
+git diff commitid HEAD --name-only | xargs -i echo '"{}"' | xargs tar zcf xxx.tar.gz
+or
+git diff commitid HEAD --name-only -z | xargs -0 tar zcf xxx.tar.gz
+```
 
 ### How to upgrade git version
 
@@ -816,7 +820,7 @@ J = F^2  = B^3^2   = A^^3^2
 
   - log
 
-    ```sh
+    ```text
     A0 <- A1 <- A2 <- A3 (master)
       \
         C0 <- C1 (test)
@@ -1067,8 +1071,8 @@ echo "fix: some message" # passes
 - **rule**: `never`
 
 ```sh
-echo ": some message" # fails
-echo "fix: some message" # passes
+echo ": some message"     # fails
+echo "fix: some message"  # passes
 ```
 
 #### scope-case
@@ -1091,12 +1095,12 @@ echo "fix(scope): some message" # passes
 - **rule**: `never`
 
 ```sh
-echo "fix(SCOPE): Some message" # fails
-echo "fix(SCOPE): Some Message" # fails
-echo "fix(SCOPE): SomeMessage" # fails
-echo "fix(SCOPE): SOMEMESSAGE" # fails
-echo "fix(scope): some message" # passes
-echo "fix(scope): some Message" # passes
+echo "fix(SCOPE): Some message"   # fails
+echo "fix(SCOPE): Some Message"   # fails
+echo "fix(SCOPE): SomeMessage"    # fails
+echo "fix(SCOPE): SOMEMESSAGE"    # fails
+echo "fix(scope): some message"   # passes
+echo "fix(scope): some Message"   # passes
 ```
 
 #### subject-empty
@@ -1105,8 +1109,8 @@ echo "fix(scope): some Message" # passes
 - **rule**: `never`
 
 ```sh
-echo "fix:" # fails
-echo "fix: some message" # passes
+echo "fix:"               # fails
+echo "fix: some message"  # passes
 ```
 
 #### subject-full-stop
@@ -1121,7 +1125,7 @@ echo "fix: some message" # passes
 
 ```sh
 echo "fix: some message." # fails
-echo "fix: some message" # passes
+echo "fix: some message"  # passes
 ```
 
 #### header-max-length
