@@ -772,7 +772,7 @@ J = F^2  = B^3^2   = A^^3^2
 
 ### Create tar that include changed file
 
-```git diff commitid HEAD --name-only | xargs tar -zcf name.tar.gz```
+```git diff commitid HEAD --name-only | xargs -i echo '"{}"' | xargs tar zcf xxx.tar.gz```
 
 ### How to upgrade git version
 

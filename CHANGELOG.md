@@ -1,3 +1,12 @@
+## [1.1.2](https://github.com/simahao/lily/compare/v1.1.1...v1.1.2) (2020-11-18)
+
+
+### Bug Fixes
+
+* fixed error when create changed tar ball that path include space ([b8a3615](https://github.com/simahao/lily/commit/b8a36159b99796f5405ff379087d6a8097ce4e98))
+
+
+
 ## [1.1.1](https://github.com/simahao/lily/compare/v1.1.0...v1.1.1) (2020-11-18)
 
 
