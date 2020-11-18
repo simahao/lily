@@ -1,3 +1,12 @@
+## [1.1.1](https://github.com/simahao/lily/compare/v1.1.0...v1.1.1) (2020-11-18)
+
+
+### Features
+
+* add commitlint rule ([5e55a94](https://github.com/simahao/lily/commit/5e55a9463e2c45ee745930b0f99752f3a47c5c79))
+
+
+
 # [1.1.0](https://github.com/simahao/lily/compare/v1.0.0...v1.1.0) (2020-11-16)
 
 

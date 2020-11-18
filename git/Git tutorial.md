@@ -41,6 +41,16 @@
     - [pathspec](#pathspec)
     - [Ignore file](#ignore-file)
     - [git commit lint](#git-commit-lint)
+      - [type-enum](#type-enum)
+      - [type-case](#type-case)
+      - [type-empty](#type-empty)
+      - [scope-case](#scope-case)
+      - [subject-case](#subject-case)
+      - [subject-empty](#subject-empty)
+      - [subject-full-stop](#subject-full-stop)
+      - [header-max-length](#header-max-length)
+    - [Warnings](#warnings)
+      - [body-leading-blank](#body-leading-blank)
     - [changelog](#changelog)
       - [changelog workflow](#changelog-workflow)
     - [Command cheat](#command-cheat)
@@ -61,7 +71,7 @@ git的配置文件分为三个级别，分别是：
 
 以global举例：
 
-```shell
+```sh
 git config --global --add cat.name tom
 gig config --global --replace-all cat.name jerry
 git config --global --unset cat.name
@@ -71,7 +81,7 @@ git config --global --unset cat.name
 
 ### get config
 
-```shell
+```sh
 git config --global --get user.name
 git config --global -l
 ```
@@ -80,7 +90,7 @@ git config --global -l
 
 通过alias可以快速完成命令
 
-```shell
+```sh
 git config --global user.name "simahao"
 git config --global user.email "abc@domain.com"
 git config --global alias.st status
@@ -97,13 +107,13 @@ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Crese
 
 - 仅本地
 
-  ```shell
+  ```sh
   git init
   ```
 
 - 先建立本地再关联远程
 
-  ```shell
+  ```sh
   git init
   ...
   git commit -m 'commets'
@@ -111,7 +121,7 @@ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Crese
 
   在github或者gitea上创建远程仓库， 为了避免歧义，最好将远程仓库名称保持和本地已经建立好的仓库名称一致
 
-  ```shell
+  ```sh
   git remote add origin https://domain/path/repo-name.git
   git push -u origin master
   ```
@@ -150,13 +160,13 @@ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Crese
 
 - 正常提交
 
-  ```shell
+  ```sh
   git commit -m 'comment'
   ```
 
 - 对于已经tracked的文件，快速提交
 
-  ```shell
+  ```sh
   git commit -am 'comment'
   ```
 
@@ -164,14 +174,14 @@ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Crese
 
   - cherry-pick one commit
 
-    ```shell
+    ```sh
     git checkout/switch master
     git cherry-pick commitid(master's lastest commitid)
     ```
 
   - stash
 
-    ```shell
+    ```sh
     git co master
     git stash push filename
     git co dev
@@ -184,7 +194,7 @@ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Crese
   - amend
     可以使用修补模式，通过--amend参数，将漏掉和文件和上次提交合并
 
-    ```shell
+    ```sh
     git commit --amend
     ```
 
@@ -195,7 +205,7 @@ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Crese
 
   - reset
 
-    ```shell
+    ```sh
     git reset commitid
     git add .
     git commit -m 'comment'
@@ -211,7 +221,7 @@ git reset命令有三种模式，分别是mixed，soft，hard， 其中mixed是�
 
   1->2->3->4(HEAD)
 
-  ```shell
+  ```sh
   git reset 3
   ```
 
@@ -221,7 +231,7 @@ git reset命令有三种模式，分别是mixed，soft，hard， 其中mixed是�
 
   1->2->3->4(HEAD)
 
-  ```shell
+  ```sh
   git reset --soft 3
   ```
 
@@ -231,7 +241,7 @@ git reset命令有三种模式，分别是mixed，soft，hard， 其中mixed是�
 
   1->2->3->4(HEAD)
 
-  ```shell
+  ```sh
   git reset --hard 3
   ```
 
@@ -315,7 +325,7 @@ restore命令可以将working tree或者stage进行恢复
 
   将dev分支合并到master
 
-  ```shell
+  ```sh
   git co master
   git merge dev
   ```
@@ -330,7 +340,7 @@ restore命令可以将working tree或者stage进行恢复
 
 - 删除远程分支
 
-  ```shell
+  ```sh
   git push origin :dev
   or
   git push origin --delete dev
@@ -344,7 +354,7 @@ restore命令可以将working tree或者stage进行恢复
 
   有master分支和topic分支，当前在master分支上
 
-  ```shell
+  ```sh
       A---B---C topic
      /
     D---E---F---G master
@@ -352,7 +362,7 @@ restore命令可以将working tree或者stage进行恢复
 
   如果想将topic上的A/B/C三次提交在master上重放，可以利用merge命令进行，合并后的状态可能是这样的，H是合并后的提交
 
-  ```shell
+  ```sh
      A---B---C topic
     /         \
     D---E---F---G---H master
@@ -429,13 +439,13 @@ rebase的功能非常丰富，一般通过交互式方式进行```git rebase -i 
 
 分支合并货真变化基础分支，可以使用rebase的功能
 
-```shell
+```sh
       A---B---C topic
       /
 D---E---F---G master
 ```
 
-```shell
+```sh
 git co topic
 git rebase master
 or
@@ -444,7 +454,7 @@ git rebase master topic
 
 结果变成
 
-```shell
+```sh
               A'--B'--C' topic
               /
 D---E---F---G master
@@ -452,7 +462,7 @@ D---E---F---G master
 
 如果master和topic都包含相同的提交内容(A和A')
 
-```shell
+```sh
       A---B---C topic
       /
 D---E---A'---F master
@@ -460,7 +470,7 @@ D---E---A'---F master
 
 结果变成
 
-```shell
+```sh
                 B'---C' topic
               /
 D---E---A'---F master
@@ -468,7 +478,7 @@ D---E---A'---F master
 
 假设我们有如下提交结构
 
-```shell
+```sh
 o---o---o---o---o  master
     \
       o---o---o---o---o  next
@@ -478,14 +488,14 @@ o---o---o---o---o  master
 
 我们想让topic分支从master分叉
 
-```shell
+```sh
 git co topic
 git rebase --onto master next topic
 ```
 
 结果变成
 
-```shell
+```sh
 o---o---o---o---o  master
     |            \
     |             o'--o'--o'  topic
@@ -590,7 +600,7 @@ o---o---o---o---o  master
 
 push之前，需要先将本地分支和远程进行关联
 
-```shell
+```sh
 git remote add origin git@domain:path/repo-name.git
 git remote add origin https://domain/path/repo-name.git
 git push -u origin master
@@ -659,9 +669,9 @@ git push -u origin master
 
   - rebase and merge
 
-    rebase模式下，如果没有代码冲突，会采用ff模式，forked repository产生的提交会进入原始仓库的commit log的主线上；如果有代码冲突，需要在本地先从原始仓库上获取代码，并在本地合并冲突
+    rebase模式下，先进行rebase，如果没有代码冲突，会采用ff模式，forked repository产生的提交会进入原始仓库的commit log的主线上；如果有代码冲突，需要在本地先从原始仓库上获取代码，并在本地合并冲突
 
-    ```shell
+    ```sh
     git remote add upstream url
     git pull --rebase upstream master
     merge conflicts
@@ -672,7 +682,7 @@ git push -u origin master
 
   - rebase and merge(--no-ff)
 
-    这种模式同上一种相比，唯一不同的是，进入原始项目的commit log会保留forked repository的commit log信息，在原始项目的commit log形成分叉
+    这种模式同rebase&merge相比，相同点是都会先进行rebase，不同点是进入原始项目的commit log会保留forked repository的commit log信息，在原始项目的commit log形成分叉。另外，同pull&merge相比，这种模式下分叉的commit hashid也会和原始提交的hashid不同，会产生一个新的hashid
 
     ![rebase&merge-noff](png/pr-rebase&merge-noff.gif)
 
@@ -686,7 +696,7 @@ git push -u origin master
 
 有如下提交，A是最后产生的提交， 为了形象化，BC水平，DEF水平，GHIJ水平，其实代表的是分支提交，有先有后，但是从A节点的角度来看，但是B和C都是A的祖先，如何来表达B，又如何来表达C？git中用~表示一个提交的第n个祖先提交，^用来表示一个提交的第n个父提交（B是A的第一个父提交，C就是A的第二个父提交）
 
-```shell
+```sh
 G   H   I   J
  \ /     \ /
   D   E   F
@@ -699,7 +709,7 @@ G   H   I   J
          A
 ```
 
-```shell
+```sh
 A =      = A^0
 B = A^   = A^1     = A~1
 C = A^2  = A^2
@@ -720,7 +730,7 @@ J = F^2  = B^3^2   = A^^3^2
 
     如果希望所有仓库都实现免密push，可以执行global模式，如果仅仅想实现某一个仓库的免密登录，则使用local模式限定即可
 
-    ```shell
+    ```sh
     git config --global credential.helper store
     git config --global push.default simple
     ```
@@ -730,7 +740,7 @@ J = F^2  = B^3^2   = A^^3^2
 
 - ssh:authorization
 
-    ```shell
+    ```sh
     ssh-keygen -t rsa
     sign in github/gitea
     setting->SSH/GPG Keys->Add key
@@ -739,14 +749,14 @@ J = F^2  = B^3^2   = A^^3^2
 
     将id_rsa.pub中的内容拷贝到content中，并给这个key起一个名字即可
 
-    ```shell
+    ```sh
     git remote rm orgin
     git remote add orgin root@192.168.128.128:zhanghao/progit.git
     ```
 
     或者
 
-    ```shell
+    ```sh
     git remote set-url origin root@192.168.128.128:zhanghao/progit.git
     ```
 
@@ -776,7 +786,7 @@ J = F^2  = B^3^2   = A^^3^2
 
 - install
 
-  ```shell
+  ```sh
   tar zxf v-xxxxx.tar.gz
   cd git-xxxx
   make configure
@@ -806,13 +816,13 @@ J = F^2  = B^3^2   = A^^3^2
 
   - log
 
-    ```shell
+    ```sh
     A0 <- A1 <- A2 <- A3 (master)
       \
         C0 <- C1 (test)
     ```
 
-    ```shell
+    ```sh
     $ git log master..test
     # output C0 C1
 
@@ -829,7 +839,7 @@ J = F^2  = B^3^2   = A^^3^2
 
   - diff
 
-    ```shell
+    ```sh
     git diff topic master or git diff topic..master
     will show the differences between the topic and master branch at that point in time
 
@@ -863,7 +873,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 - 使用
   - File or directory
 
-    ```shell
+    ```sh
     git add .           # add CWD(current working directory)
     git add src/        # add src/ directory
     git add README      # add only README file or directory
@@ -874,13 +884,13 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
   - 通配符(wildcards)
 
-    ```shell
+    ```sh
     git log '*.js' # logs all .js files in CWD and subdirectories
     git log '.*'   # logs all 'hidden' files and directories in CWD
     git log '*/.*' # logs all 'hidden' files and directories in subdirectorie
     ```
 
-    ```shell
+    ```sh
     # example directory structure
     #
     # .
@@ -894,7 +904,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
     shell先解释
 
-    ```shell
+    ```sh
     git ls-files *.json
 
     # package-lock.json
@@ -903,7 +913,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
     git先解释
 
-    ```shell
+    ```sh
     git ls-files '*.json'
 
     # data/bar.json
@@ -918,7 +928,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
       top签名告诉git从仓库的根目录开始检索，而不是当前目录
 
-      ```shell
+      ```sh
       git ls-files ':(top)*.js'
       git ls-files ':/*.js' # shorthand
       ```
@@ -927,7 +937,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
       icase签名告诉git匹配的时候不要关注大小写
 
-      ```shell
+      ```sh
       git ls-files ':(icase)*.jpg'
       ```
 
@@ -935,7 +945,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
       literal签名告诉git所有的字符都是普通字符，特别是针对通配符想还原它的本义的时候
 
-      ```shell
+      ```sh
       git log ':(literal)*.js' # returns log for the file '*.js'
       ```
 
@@ -950,7 +960,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
         A trailing "/**" matches everything inside
 
-      ```shell
+      ```sh
       git ls-files ':(glob)src/components/**/*.jsx' # ** can match zero or more directories
       ```
 
@@ -958,7 +968,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
       exluce签名可以再检索结果中排除掉你指定的文件
 
-      ```shell
+      ```sh
       git grep 'foo' -- '*.js' ':(exclude)*.spec.js' # search .js files excluding .spec.js
       git grep 'foo' -- '*.js' ':!*.spec.js' .       # shorthand for the same
       ```
@@ -967,7 +977,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
       我们可以联合使用魔力签名
 
-      ```shell
+      ```sh
       git ls-files -- ':(top,icase,glob,:!vendored)src/components/*/*.jsx'
       ```
 
@@ -981,7 +991,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
   比如说：把gz文件也add到index中
 
-  ```shell
+  ```sh
   git rm -r --cached .    //r:递归 --cached：删除index
   create ingore file
   git add .
@@ -993,10 +1003,11 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
 执行以下语句
 
-```shell
-npm install -D @commitlint/{config-angular,cli} husky
+```sh
 # cd project directory
-# 进入本地仓库根目录
+# make sure your nodejs version >= 10
+
+npm install -D @commitlint/{config-angular,cli} husky
 echo "module.exports = {extends: ['@commitlint/config-angular']};" > commitlint.config.js
 cat >>.huskyrc<<EOF
 {
@@ -1007,12 +1018,143 @@ cat >>.huskyrc<<EOF
 EOF
 ```
 
+commitlint规则：
+
+#### type-enum
+
+- **condition**: `type` is found in value
+- **rule**: `always`
+- **value**
+
+```sh
+  [
+    'build',
+    'ci',
+    'docs',
+    'feat',
+    'fix',
+    'perf',
+    'refactor',
+    'revert',
+    'style',
+    'test'
+  ]
+```
+
+```sh
+echo "foo: some message" # fails
+echo "fix: some message" # passes
+```
+
+#### type-case
+
+- **description**: `type` is in case `value`
+- **rule**: `always`
+- **value**
+
+  ```sh
+    'lowerCase'
+  ```
+
+```sh
+echo "FIX: some message" # fails
+echo "fix: some message" # passes
+```
+
+#### type-empty
+
+- **condition**: `type` is empty
+- **rule**: `never`
+
+```sh
+echo ": some message" # fails
+echo "fix: some message" # passes
+```
+
+#### scope-case
+
+- **condition**: `scope` is in case `value`
+- **rule**: `always`
+
+```sh
+'lowerCase'
+```
+
+```sh
+echo "fix(SCOPE): some message" # fails
+echo "fix(scope): some message" # passes
+```
+
+#### subject-case
+
+- **condition**: `subject` is in one of the cases `['sentence-case', 'start-case', 'pascal-case', 'upper-case']`
+- **rule**: `never`
+
+```sh
+echo "fix(SCOPE): Some message" # fails
+echo "fix(SCOPE): Some Message" # fails
+echo "fix(SCOPE): SomeMessage" # fails
+echo "fix(SCOPE): SOMEMESSAGE" # fails
+echo "fix(scope): some message" # passes
+echo "fix(scope): some Message" # passes
+```
+
+#### subject-empty
+
+- **condition**: `subject` is empty
+- **rule**: `never`
+
+```sh
+echo "fix:" # fails
+echo "fix: some message" # passes
+```
+
+#### subject-full-stop
+
+- **condition**: `subject` ends with `value`
+- **rule**: `never`
+- **value**
+
+```sh
+'.'
+```
+
+```sh
+echo "fix: some message." # fails
+echo "fix: some message" # passes
+```
+
+#### header-max-length
+
+- **condition**: `header` has `value` or less characters
+- **rule**: `always`
+- **value**
+
+```sh
+72
+```
+
+```sh
+echo "fix: some message that is way too long and breaks the line max-length by several characters" # fails
+echo "fix: some message" # passes
+```
+
+### Warnings
+
+The following rules are considered warnings for `@commitlint/config-angular` and will print warning messages when not met.
+
+#### body-leading-blank
+
+- **condition**: Body begins with blank line
+- **rule**: `always`
+
 ### changelog
 
 利用conventional-changelog-cli组件实现changelog的自动编写
 
-```shell
+```sh
 npm install -g conventional-changelog-cli
+# cd project directory
 npm init
 ```
 
