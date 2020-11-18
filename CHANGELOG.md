@@ -1,3 +1,19 @@
+## [1.1.3](https://github.com/simahao/lily/compare/v1.1.2...v1.1.3) (2020-11-18)
+
+
+### Bug Fixes
+
+* change hashid to SHA-1 ([dcc7c2f](https://github.com/simahao/lily/commit/dcc7c2f59b3934552e0f832434d585a3f6813615))
+* use -A and . option in git add command ([be87825](https://github.com/simahao/lily/commit/be87825a76900fc918a232e38cf5e599995b45c4))
+
+
+### Features
+
+* add another command for create tar ball that include changed files ([97bd770](https://github.com/simahao/lily/commit/97bd770f023f839c954fc4cb4da616f21da4ad53))
+* fix some descriptions ([f0853d0](https://github.com/simahao/lily/commit/f0853d0cce971527c11083ad2ebf41d6f96c3c6f))
+
+
+
 ## [1.1.2](https://github.com/simahao/lily/compare/v1.1.1...v1.1.2) (2020-11-18)
 
 

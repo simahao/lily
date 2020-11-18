@@ -333,6 +333,8 @@ restore命令可以将working tree或者stage进行恢复
 
   ```git push origin :<old_branch_name> <new_branch_name>```
 
+  refspec格式: src:dst， src省略代表删除操作
+
 - 删除远程分支
 
   ```sh
@@ -352,7 +354,7 @@ restore命令可以将working tree或者stage进行恢复
   ```text
       A---B---C topic
      /
-    D---E---F---G master
+    D---E---F---G *master
   ```
 
   如果想将topic上的A/B/C三次提交在master上重放，可以利用merge命令进行，合并后的状态可能是这样的，H是合并后的提交
@@ -360,7 +362,7 @@ restore命令可以将working tree或者stage进行恢复
   ```text
      A---B---C topic
     /         \
-    D---E---F---G---H master
+    D---E---F---G---H *master
   ```
 
   当合并的过程中发生了冲突，可以利用git merge --abort进行终止操作，特别需要注意的是，如果本地有一些重要的修改，还没有提交，git的merge操作不能保证--abort一定返回之前的状态，因此merge前要保持working tree干净。merge有三种主要的方式，利用下面这张图说明一下三种方式的不同
@@ -432,11 +434,11 @@ rebase的功能非常丰富，一般通过交互式方式进行```git rebase -i 
 
 ### rebase senario two
 
-分支合并货真变化基础分支，可以使用rebase的功能
+分支合并或者变化基础分支，可以使用rebase的功能
 
 ```text
-      A---B---C topic
-      /
+      A---B---C *topic
+     /
 D---E---F---G master
 ```
 
@@ -451,7 +453,7 @@ git rebase master topic
 
 ```text
               A'--B'--C' topic
-              /
+             /
 D---E---F---G master
 ```
 
@@ -459,7 +461,7 @@ D---E---F---G master
 
 ```text
       A---B---C topic
-      /
+     /
 D---E---A'---F master
 ```
 
@@ -475,10 +477,10 @@ D---E---A'---F master
 
 ```text
 o---o---o---o---o  master
-    \
+     \
       o---o---o---o---o  next
-                      \
-                        o---o---o  topic
+                       \
+                        o---o---o  *topic
 ```
 
 我们想让topic分支从master分叉
@@ -494,36 +496,36 @@ git rebase --onto master next topic
 o---o---o---o---o  master
     |            \
     |             o'--o'--o'  topic
-    \
+     \
       o---o---o---o---o  next
 ```
 
 
 ## How to use diff
 
-- working tree VS index
+- working tree and index
 
   ```git diff```
 
-- index VS repo
+- index and repository
 
   ```git diff --cached [<path>...]```
 
-- working tree VS repo
+- working tree and repository
 
   ```git diff HEAD```
 
-- working tree VS commitid
+- working tree and SHA-1
 
-  ```git diff commitid [<path>...]```
+  ```git diff SHA-1 [<path>...]```
 
-- index VS commitid
+- index and SHA-1
 
-  ```git diff --cached commitid [<path>...]```
+  ```git diff --cached SHA-1 [<path>...]```
 
-- commitid Vs commitid
+- SHA-1 and SHA-1'
 
-  ```git diff commitid commitid```
+  ```git diff SHA-1 SHA-1'```
 
 ## How to use tag
 
@@ -549,7 +551,7 @@ o---o---o---o---o  master
 
 ## How to use stash
 
-  我们不想提交完成一半或者不完善的代码，但是却需要修改一个紧急Bug，那么就应该使用'git stash'，将你当前未提交到本地（和服务器）的代码推入到Git的stash栈中，这时候你的工作区间和上一次提交的内容是完全一样的，所以你可以创建分支，修改bug等，等完成bug提交后，再使用'git stash apply'将以前工作状态找回来
+  working tree下进行了部分修改，此时需要修改一个紧急bug，这是不想提交部分完成的代码，那么就应该使用`git stash`，将你当前未提交到本地（和服务器）的代码推入到git的stash栈中。执行完stash命令后，working tree的状态返回到最近一次commit的状态，这时，你可以创建分支并完成bug的修改工作，等完成bug修改并merge会开发分支，我们想恢复之前部分完成的代码，我们使用`git stash apply`或者`git stash pop`将以前工作状态找回来
 
 - 显示栈信息
 
@@ -563,11 +565,21 @@ o---o---o---o---o  master
 
   ```git stash push path```
 
-- 运用栈
+  ```text
+  -u
+  This option is only valid for push and save commands
+  All untracked files are also stashed and then cleaned up with git clean
+
+  -a
+  This option is only valid for push and save commands
+  All ignored and untracked files are also stashed and then cleaned up with git clean
+  ```
+
+- 运用栈（不删除）
 
   ```git stash apply```
 
-- 出栈
+- 出栈（删除）
 
   ```git stash pop```
 
@@ -648,13 +660,13 @@ git push -u origin master
 
 ### How to pull request in teamwork
 
-在github/gitea的管理模型中，一般的做法是，contributor fork原始项目，进行bugfix或者feature的开发，然后通过PR的方式提交申请，由项目的owner进行代码的审核和合并操作
+在github/gitea的管理模型中，一般的做法是，contributor fork原始项目，进行bugfix或者feature的开发，然后通过PR的方式提交申请，由项目的maintainer进行代码的审核和合并操作
 
 ![workflow](png/fullflow.png)
 
 ### workflow
 
-- 在forked的项目中提交PR，确认是否有代码冲突，如果有冲突，首先要解决冲突。解决冲突的方式就是要拉取'upstream'的代码，在本地解决冲突，解决完毕后，上传代码到forked的remote仓库，然后再由upstream的repository的owner进行PR
+- 在forked的项目中提交PR，确认是否有代码冲突，如果有冲突，首先要解决冲突。解决冲突的方式就是要拉取'upstream'的代码，在本地解决冲突，解决完毕后，上传代码到forked的remote仓库，然后再由upstream的repository的maintainer进行PR操作
 - 在原始的仓库中处理合并操作，合并的操作可以选择下面四种
   - pull and merge
 
@@ -689,7 +701,7 @@ git push -u origin master
 
 ## How to use revision
 
-有如下提交，A是最后产生的提交， 为了形象化，BC水平，DEF水平，GHIJ水平，其实代表的是分支提交，有先有后，但是从A节点的角度来看，但是B和C都是A的祖先，如何来表达B，又如何来表达C？git中用~表示一个提交的第n个祖先提交，^用来表示一个提交的第n个父提交（B是A的第一个父提交，C就是A的第二个父提交）
+假设有如下提交，A是最后产生的提交， 为了形象化，BC水平，DEF水平，GHIJ水平，其实代表的是分支提交，有先有后，但是从A节点的角度来看，B和C都是A的祖先，如何来表达B，又如何来表达C？git中用~表示一个提交的第n个祖先提交，^用来表示一个提交的第n个父提交（B是A的第一个父提交，C就是A的第二个父提交）
 
 ```text
 G   H   I   J
@@ -767,10 +779,12 @@ J = F^2  = B^3^2   = A^^3^2
 
 ### Create tar that include changed file
 
-```sh
-git diff commitid HEAD --name-only | xargs -i echo '"{}"' | xargs tar zcf xxx.tar.gz
+```text
+git diff SHA-1 HEAD --name-only | xargs -i echo '"{}"' | xargs tar zcf xxx.tar.gz
 or
-git diff commitid HEAD --name-only -z | xargs -0 tar zcf xxx.tar.gz
+git diff SHA-1 HEAD --name-only -z | xargs -0 tar zcf xxx.tar.gz
+or
+git diff SHA-1 SHA-1' --name-only -z | xargs -0 tar zcf xxx.tar.gz
 ```
 
 ### How to upgrade git version
@@ -863,7 +877,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 - git解释
   - 加引号
 
-    ```git add './*.txt'```，这样就将*解释成当前目录已经子目录，进行递归
+    ```git add './*.txt'```，这样就将*解释成当前目录以及子目录，进行递归
 
   - 不加引号
 
@@ -988,19 +1002,19 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
 - 忘记先生成ignore文件，并产生提交
 
-  比如说：把gz文件也add到index中
+  比如说把gz文件也add到index中
 
   ```sh
   git rm -r --cached .    //r:递归 --cached：删除index
-  create ingore file
+  create .gitignore file and edit .gitignore
   git add .
   ```
 
 ### git commit lint
 
-通过commitlint和husky两个组件上线commit的message hook
+通过commitlint和husky两个组件可以实现commit的message hook，规范提交的信息
 
-执行以下语句
+install执行以下语句
 
 ```sh
 # cd project directory
