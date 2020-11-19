@@ -1,3 +1,12 @@
+## [1.1.5](https://github.com/simahao/lily/compare/v1.1.4...v1.1.5) (2020-11-19)
+
+
+### Bug Fixes
+
+* fix title case ([9fbef23](https://github.com/simahao/lily/commit/9fbef23bb920bf7ca8df3306be78d5c99ca922c9))
+
+
+
 ## [1.1.4](https://github.com/simahao/lily/compare/v1.1.3...v1.1.4) (2020-11-19)
 
 
