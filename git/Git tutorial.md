@@ -49,8 +49,8 @@
       - [subject-empty](#subject-empty)
       - [subject-full-stop](#subject-full-stop)
       - [header-max-length](#header-max-length)
-    - [Warnings](#warnings)
-      - [body-leading-blank](#body-leading-blank)
+      - [Warnings](#warnings)
+        - [body-leading-blank](#body-leading-blank)
     - [changelog](#changelog)
       - [changelog workflow](#changelog-workflow)
     - [Command cheat](#command-cheat)
@@ -1152,11 +1152,11 @@ echo "fix: some message that is way too long and breaks the line max-length by s
 echo "fix: some message" # passes
 ```
 
-### Warnings
+#### Warnings
 
 The following rules are considered warnings for `@commitlint/config-angular` and will print warning messages when not met.
 
-#### body-leading-blank
+##### body-leading-blank
 
 - **condition**: Body begins with blank line
 - **rule**: `always`

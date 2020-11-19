@@ -1,3 +1,12 @@
+## [1.1.4](https://github.com/simahao/lily/compare/v1.1.3...v1.1.4) (2020-11-19)
+
+
+### Bug Fixes
+
+* fix title hierarchy ([00c9293](https://github.com/simahao/lily/commit/00c9293be76221eb55fcf95130c887350bcc11be))
+
+
+
 ## [1.1.3](https://github.com/simahao/lily/compare/v1.1.2...v1.1.3) (2020-11-18)
 
 
