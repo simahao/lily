@@ -956,7 +956,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
     - literal
 
-      literal签名告诉git所有的字符都是普通字符，特别是针对通配符想还原它的本义的时候
+      literal签名告诉git所有的字符都是普通字符，特别是针对通配符想还原它的本意的时候
 
       ```sh
       git log ':(literal)*.js' # returns log for the file '*.js'
@@ -979,7 +979,7 @@ git具备时光穿梭机的功能，既可以回退，也可以在回退之后�
 
     - exclude(shorthand of :! or :^)
 
-      exluce签名可以再检索结果中排除掉你指定的文件
+      excluce签名可以在检索结果中排除掉你指定的文件
 
       ```sh
       git grep 'foo' -- '*.js' ':(exclude)*.spec.js' # search .js files excluding .spec.js
