@@ -369,14 +369,16 @@ restore命令可以将working tree或者stage进行恢复
 
   master文件
 
-  ![merge-noff-master](https://cdn.jsdelivr.net/gh/simahao/picture@master/git/merge-noff-master.png) 
+  ![merge-noff-master](https://cdn.jsdelivr.net/gh/simahao/picture@master/git/merge-noff-master.png)
 
   dev分支文件经过2次提交后
+
   ![merge-noff-dev](https://cdn.jsdelivr.net/gh/simahao/picture@master/git/merge-noff-dev.png)
 
 - --no-ff
   - 即使git认为可以使用fast方式，也会产生一次commit操作
   - 如果合并tag，默认会采用这种方式
+
     ![merge-noff](https://cdn.jsdelivr.net/gh/simahao/picture@master/git/merge-noff.png)
 
 - --squash
