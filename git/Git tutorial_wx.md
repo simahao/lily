@@ -242,11 +242,7 @@ git reset命令有三种模式，分别是mixed，soft，hard， 其中mixed是�
 
   执行之后变成1->2->3(HEAD)，working tree、index、repo都为commitid=3的状态
 
-  | working tree | index | head  | target commitid |  flag   | working tree | index | head  |
-  | :----------: | :---: | :---: | :-------------: | :-----: | :----------: | :---: | :---: |
-  |      A       |   B   |   C   |        D        | --soft  |      A       |   B   |   D   |
-  |              |       |       |                 | --mixed |      A       |   D   |   D   |
-  |              |       |       |                 | --hard  |      D       |   D   |   D   |
+  ![reset](https://cdn.jsdelivr.net/gh/simahao/picture@master/git/reset.png)
 
 ### usage
 
