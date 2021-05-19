@@ -128,9 +128,9 @@ Nexus3的私有仓库管理类型主要三种：
         <!--forbid anonymous executing deployment command,
         authentication info is set here -->
         <server>
-            <id>${ID}</id>
-            <username>${USER}</username>
-            <password>${PASSWORD}</password>
+            <id>dev2-nexus3</id>
+            <username>dev2</username>
+            <password>Dev2Dev2</password>
         </server>
     </servers>
     ```
@@ -143,9 +143,9 @@ Nexus3的私有仓库管理类型主要三种：
         so this mirror should have all the artifact,
         we can group all the private repo into public repository -->
         <mirror>
-            <id>${ID}</id>
+            <id>dev2-nexus3</id>
             <mirrorOf>*</mirrorOf>
-            <url>${MAVEN-PUBLIC}</url>
+            <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
         </mirror>
     </mirrors>
     ```
@@ -159,8 +159,8 @@ Nexus3的私有仓库管理类型主要三种：
             <repositories>
                 <repository>
                     <!--should same as  mirrors/mirros/id  -->
-                    <id>${ID}</id>
-                    <url>${MAVEN-PUBLIC}</url>
+                    <id>dev2-nexus3</id>
+                    <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
                     <releases>
                         <enabled>true</enabled>
                     </releases>
@@ -172,8 +172,8 @@ Nexus3的私有仓库管理类型主要三种：
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>${ID}</id>
-                    <url>${MAVEN-PUBLIC}</url>
+                    <id>dev2-nexus3</id>
+                    <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
                     <releases>
                         <enabled>true</enabled>
                     </releases>
@@ -201,14 +201,14 @@ Nexus3的私有仓库管理类型主要三种：
         <distributionManagement>
         <repository>
             <!--should same as  servers/server/id in settings.xml -->
-            <id>${ID}</id>
+            <id>dev2-nexus3</id>
             <name>release repository for deployment</name>
-            <url>${MAVEN-RELEASES}</url>
+            <url>http://172.27.234.197:8082/nexus3/repository/maven-releases</url>
         </repository>
         <snapshotRepository>
-            <id>${ID}</id>
+            <id>dev2-nexus3</id>
             <name>snapshots repository for deployment</name>
-            <url>${MAVEN-SNAPSHOTS}</url>
+            <url>http://172.27.234.197:8082/nexus3/repository/maven-snapshots</url>
         </snapshotRepository>
         </distributionManagement>
         ...
@@ -226,9 +226,9 @@ Nexus3的私有仓库管理类型主要三种：
         ...
         <repositories>
             <repository>
-                <id>${ID}</id>
+                <id>dev2-nexus3</id>
                 <name>dev2 mirror server</name>
-                <url>${MAVEN-PUBLIC}</url>
+                <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
                 <releases>
                     <enabled>true</enabled>
                 </releases>
@@ -240,9 +240,9 @@ Nexus3的私有仓库管理类型主要三种：
         </repositories>
         <pluginRepositories>
             <pluginRepository>
-                <id>${ID}</id>
+                <id>dev2-nexus3</id>
                 <name>dev2 mirror server</name>
-                <url>${MAVEN-PUBLIC}</url>
+                <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
                 <releases>
                     <enabled>true</enabled>
                 </releases>
@@ -253,14 +253,14 @@ Nexus3的私有仓库管理类型主要三种：
         </pluginRepositories>
         <distributionManagement>
             <repository>
-                <id>${ID}</id>
+                <id>dev2-nexus3</id>
                 <name>release repository for deployment</name>
-                <url>${MAVEN-RELEASES}</url>
+                <url>http://172.27.234.197:8082/nexus3/repository/maven-releases</url>
             </repository>
             <snapshotRepository>
-                <id>${ID}</id>
+                <id>dev2-nexus3</id>
                 <name>snapshotRepository repository for deployment</name>
-                <url>${MAVEN-SNAPSHOTS}</url>
+                <url>http://172.27.234.197:8082/nexus3/repository/maven-snapshots</url>
             </snapshotRepository>
         </distributionManagement>
         ...
@@ -324,13 +324,13 @@ Nexus3的私有仓库管理类型主要三种：
 
 - step1:
 
-    ```npm config set registry ${NPM-PUBLIC}```
+    ```npm config set registry http://172.27.234.197:8082/nexus3/repository/npm-public```
 
 - step2:
 
-    ```npm adduser --registry=${NPM-PUBLIC}```
+    ```npm adduser --registry=http://172.27.234.197:8082/nexus3/repository/npm-public```
 
-    按照提示输入```${USER}```和```${PASSWORD}```，邮箱输入```${EMAIL}```，或者其他都可以（第一次写的邮箱，后续就会使用这个email)，如果忘记，可以将~/.npmrc清空，重新执行step1、step2
+    按照提示输入```dev2```和```Dev2Dev2```，邮箱输入```abc@dev2.com```，或者其他都可以（第一次写的邮箱，后续就会使用这个email)，如果忘记，可以将~/.npmrc清空，重新执行step1、step2
 
 ### 下载与部署
 
@@ -365,19 +365,19 @@ Nexus3的私有仓库管理类型主要三种：
 
 - 部署
 
-    因为OSS版本不支持直接publish到group仓库，因此需要按照以下步骤执行，注意registry是${NPM-HOSTED}
+    因为OSS版本不支持直接publish到group仓库，因此需要按照以下步骤执行，注意registry是http://172.27.234.197:8082/nexus3/repository/npm-hosted
 
-  - ```npm adduser --registry=${NPM-HOSTED}```
+  - ```npm adduser --registry=http://172.27.234.197:8082/nexus3/repository/npm-hosted```
 
   - 修改package.json，添加
 
     ```json
         "publishConfig": {
-        "registry": "${NPM-HOSTED}"
+        "registry": "http://172.27.234.197:8082/nexus3/repository/npm-hosted"
         }
     ```
 
-  - 执行 ```npm publish```就可以发布到npm-hosted仓库，如果不修改package.json，每次需要执行```npm publish --registry=${NPM-HOSTED}```
+  - 执行 ```npm publish```就可以发布到npm-hosted仓库，如果不修改package.json，每次需要执行```npm publish --registry=http://172.27.234.197:8082/nexus3/repository/npm-hosted```
 
 ## Pypi
 
@@ -390,16 +390,16 @@ Nexus3的私有仓库管理类型主要三种：
 
 ```ini
 [global]
-index = ${PYPI-PUBLIC}/pypi
-index-url = ${PYPI-PUBLIC}/simple
-trusted-host = ${IP}
+index = http://172.27.234.197:8082/nexus3/repository/pypi-public/pypi
+index-url = http://172.27.234.197:8082/nexus3/repository/pypi-public/simple
+trusted-host = 172.27.234.197
 ```
 
 ### 下载与部署
 
 - 下载
 
-    执行pip install xx的时候，会提示输入用户名和密码，请输入```${USER}```和```${PASSWORD}```
+    执行pip install xx的时候，会提示输入用户名和密码，请输入```dev2```和```Dev2Dev2```
 
 - 部署
 
@@ -419,13 +419,13 @@ trusted-host = ${IP}
             pypi
             nexus
         [pypi]
-        repository=${PYPI-PUBLIC}/pypi
-        username=${USER}
-        password=${PASSWORD}
+        repository=http://172.27.234.197:8082/nexus3/repository/pypi-public/pypi
+        username=dev2
+        password=Dev2Dev2
         [nexus]
-        repository=${PYPI-HOSTED}
-        username=${USER}
-        password=${PASSWORD}
+        repository=http://172.27.234.197:8082/nexus3/repository/pypi-hosted
+        username=dev2
+        password=Dev2Dev2
         ```
 
     - 工程中新建setup.py文件
@@ -503,22 +503,22 @@ trusted-host = ${IP}
   - 修改hosts
 
     ```shell
-    echo "${IP} ${DOMAIN}" >> /etc/hosts
-    mkdir -p /etc/docker/certs.d/${DOMAIN}
+    echo "172.27.234.197 dev2.docker" >> /etc/hosts
+    mkdir -p /etc/docker/certs.d/dev2.docker
     ```
 
-  - 外网：通过github将root.crt文件下载后，放置在`/etc/docker/certs.d/${DOMAIN}`目录下
+  - 外网：通过github将root.crt文件下载后，放置在`/etc/docker/certs.d/dev2.docker`目录下
 
     - 访问`https://github.com/simahao/lily/tree/main/devops/nexus/out/root.crt`
     - 通过github提供的raw按钮，点击右键下载证书文件
-    - 将root.crt文件放置在`/etc/docker/certs.d/${DOMAIN}`目录下
+    - 将root.crt文件放置在`/etc/docker/certs.d/dev2.docker`目录下
 
   - 内网：gitea访问zhanghao/lily项目，获取root.crt文件
 
   - 执行以下命令，相关信息会保存在~/.docker/config.json
 
     ```shel
-    docker login -u ${USER} -p ${PASSWORD} ${DOMAIN}
+    docker login -u dev2 -p Dev2Dev2 dev2.docker
     ```
 
 
@@ -526,7 +526,7 @@ trusted-host = ${IP}
 
     ```json
     {
-        "insecure-registries": [${DOMAIN}]
+        "insecure-registries": [dev2.docker]
     }
     ```
 
@@ -538,7 +538,7 @@ trusted-host = ${IP}
 - 执行以下命令，相关信息会保存在~/.docker/config.json
 
     ```shell
-    docker login -u ${USER} -p ${PASSWORD} ${DOMAIN}
+    docker login -u dev2 -p Dev2Dev2 dev2.docker
     ```
 
 ### 下载与部署
@@ -546,16 +546,16 @@ trusted-host = ${IP}
 - 下载
 
     ```shell
-    docker pull ${DOMAIN}/component_name
+    docker pull dev2.docker/component_name
     ```
 
 - 部署
 
     ```shell
     # 制作docker镜像xxxx
-    docker login -u ${USER} -p ${PASSWORD} ${DOMAIN}
-    docker tag component_name ${DOMAIN}/component_name
-    docker push ${DOMAIN}/component_name
+    docker login -u dev2 -p Dev2Dev2 dev2.docker
+    docker tag component_name dev2.docker/component_name
+    docker push dev2.docker/component_name
     ```
 
 ### 相关命令
@@ -578,7 +578,7 @@ docker rmi xxx
 channels:
   - defaults
 default_channels:
-  - ${CONDA-PUBLIC}
+  - http://dev2:Dev2Dev2@172.27.234.197:8082/nexus3/repository/conda-public
 show_channel_urls: true
 ```
 

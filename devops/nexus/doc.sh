@@ -10,6 +10,7 @@
 # version |  date    | comments                                 |
 # --------------------------------------------------------------|
 # 1.0.0   | 20210516 | init                                     |
+# 1.0.1   | 20210519 | support mac                              |
 #---------------------------------------------------------------|
 
 ID=dev2-nexus3
@@ -41,6 +42,17 @@ IN_PYPI_PUBLIC=${IN_BASE_URL}/pypi-public
 IN_PYPI_HOSTED=${IN_BASE_URL}/pypi-hosted
 IN_CONDA_PUBLIC="http://${USER}:${PASSWORD}@${IN_IP}:${PORT}/nexus3/repository/conda-public"
 
+OS=$(uname)
+# alias is opened by default under interactive mode
+# shell is non-interactive mode, so open alias explictly
+# or use /bin/bash -login and put alias setting in ~/.bashrc
+shopt -s expand_aliases
+
+if [[ ${OS} == "Darwin" ]]; then
+    alias mysed="sed -i ''"
+else
+    alias mysed="sed -i"
+fi
 
 function usage() {
     echo "NAME"
@@ -61,7 +73,7 @@ function doc() {
         echo "no parameter!"
         usage
     elif [[ $1 == "i" ]]; then
-        sed -i -e "s#\${ID}#${ID}#g" \
+        mysed -e "s#\${ID}#${ID}#g" \
             -e "s#\${USER}#${USER}#g" \
             -e "s#\${PASSWORD}#${PASSWORD}#g" \
             -e "s#\${IP}#${IN_IP}#g" \
@@ -76,7 +88,7 @@ function doc() {
             -e "s#\${DOMAIN}#${DOMAIN}#g" \
             -e "s#\${CONDA-PUBLIC}#${IN_CONDA_PUBLIC}#g" nexus.md
     elif [[ $1 == "o" ]]; then
-        sed -i -e "s#\${ID}#${ID}#g" \
+        mysed -e "s#\${ID}#${ID}#g" \
             -e "s#\${USER}#${USER}#g" \
             -e "s#\${PASSWORD}#${PASSWORD}#g" \
             -e "s#\${IP}#${OUT_IP}#g" \
