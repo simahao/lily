@@ -64,9 +64,8 @@ function doc() {
         sed -i -e "s#\${ID}#${ID}#g" \
             -e "s#\${USER}#${USER}#g" \
             -e "s#\${PASSWORD}#${PASSWORD}#g" \
-            -e "s#\${IP}#${IP}#g" \
+            -e "s#\${IP}#${IN_IP}#g" \
             -e "s#\${EMAIL}#${EMAIL}#g" \
-            -e "s#\${IN-IP}#${IN_IP}#g" \
             -e "s#\${MAVEN-PUBLIC}#${IN_MAVEN_PUBLIC}#g" \
             -e "s#\${MAVEN-RELEASES}#${IN_MAVEN_RELEASES}#g" \
             -e "s#\${MAVEN-SNAPSHOTS}#${IN_MAVEN_SNAPSHOTS}#g" \
@@ -80,7 +79,7 @@ function doc() {
         sed -i -e "s#\${ID}#${ID}#g" \
             -e "s#\${USER}#${USER}#g" \
             -e "s#\${PASSWORD}#${PASSWORD}#g" \
-            -e "s#\${IP}#${IP}#g" \
+            -e "s#\${IP}#${OUT_IP}#g" \
             -e "s#\${EMAIL}#${EMAIL}#g" \
             -e "s#\${MAVEN-PUBLIC}#${OUT_MAVEN_PUBLIC}#g" \
             -e "s#\${MAVEN-RELEASES}#${OUT_MAVEN_RELEASES}#g" \
