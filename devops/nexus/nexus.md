@@ -107,12 +107,12 @@ Nexus3的私有仓库管理类型主要三种：
 | pluginRepositories     |              |    √    |
 | distributionManagement |              |    √    |
 
-**方案对比**：建议方案一
+**方案对比**：
 
-|        | pros                                       | cons                             |
-| ------ | ------------------------------------------ | -------------------------------- |
-| 方案一 | 全局生效，不用每个项目都配置，适合团队模式 | -                                |
-| 方案二 | 项目内查看相关信息方便                     | 每个项目组都要复制一份，略显冗余 |
+|        | pros                                                         |
+| ------ | ------------------------------------------------------------ |
+| 方案一 | 全局生效，不用每个项目都配置，**适合外网个人使用**           |
+| 方案二 | 项目内查看相关信息方便，项目整体配置，透明化，**适合内网项目组使用** |
 
 - 方案一：
 
@@ -302,7 +302,7 @@ Nexus3的私有仓库管理类型主要三种：
 
     ```shell
     #!/bin/bash
-
+  
     find . -name "*.lastUpdated*" -print -exec rm -rf {} \;
     or
     find . -name "*.lastUpdated*" -print | xargs rm -rf
@@ -672,7 +672,7 @@ nexus为大部分仓库提供了hosted、proxy、group模型，基本操作是�
         upstream nexus_docker_put {
             server 172.27.234.197:9072;
         }
-
+    
         server {
             listen       80;
             listen       443 ssl;
@@ -691,7 +691,7 @@ nexus为大部分仓库提供了hosted、proxy、group模型，基本操作是�
                 set $upstream "nexus_docker_get";
             }
             index index.html index.htm index.php;
-
+    
             location / {
                 proxy_pass http://$upstream;
                 proxy_set_header Host $host;
@@ -704,7 +704,7 @@ nexus为大部分仓库提供了hosted、proxy、group模型，基本操作是�
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Proto http;
             }
-
+    
     ```
 
 ### Tasks
