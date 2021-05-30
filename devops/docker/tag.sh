@@ -31,13 +31,23 @@ NAME:
 EXAMPLE:
     - list tags for nginx, only show recet versions
         tag.sh nginx 
+    - list tags for personal images,e.x. getting-started
+        tag.sh docker/getting-started
     - list all tags for nginx 
         tag.sh -a nginx 
 EOF
 }
 
 function docker-tag() {
-    local url="https://registry.hub.docker.com/v2/repositories/library/$1/tags/?page_size=100"
+    local url=""
+    grep -s '/' $1 > /dev/null
+    if [[ $? == 0 ]]; then
+        # personal or organization images, e.x. docker/getting-started
+        url="https://registry.hub.docker.com/v2/repositories/$1/tags/?page_size=100"
+    else
+        # offical images, e.x. nginx
+        url="https://registry.hub.docker.com/v2/repositories/library/$1/tags/?page_size=100"
+    fi
     local total_results=""
     while [[ -n ${url} ]]; do
 	result=$(curl -s -S ${url})
