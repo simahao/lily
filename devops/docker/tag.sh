@@ -40,7 +40,7 @@ EOF
 
 function docker-tag() {
     local url=""
-    grep -s '/' $1 > /dev/null
+    echo $1 | grep -s '/' > /dev/null
     if [[ $? == 0 ]]; then
         # personal or organization images, e.x. docker/getting-started
         url="https://registry.hub.docker.com/v2/repositories/$1/tags/?page_size=100"
@@ -51,6 +51,11 @@ function docker-tag() {
     local total_results=""
     while [[ -n ${url} ]]; do
 	result=$(curl -s -S ${url})
+    echo "${result}" | grep "not found" > /dev/null
+    if [[ $? == 0 ]]; then
+        echo "get tags url failed:${result}"
+        exit 1
+    fi
 	result=$(python3 - <<EOF
 import sys, json
 data = json.loads('''$result''');
