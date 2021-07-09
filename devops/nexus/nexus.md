@@ -526,7 +526,7 @@ trusted-host = 172.27.234.197
 
     ```json
     {
-        "insecure-registries": [dev2.docker]
+        "insecure-registries": ["dev2.docker"]
     }
     ```
 
