@@ -1,5 +1,6 @@
 import logging
 import queue
+import threading
 
 import pymysql
 
@@ -76,8 +77,21 @@ class Connection(pymysql.connections.Connection):
 
 class ConnectionPool:
 
-    def __init__(self, *args, **kwargs):
-        pass
+    _HARD_LIMIT = 10
+    _THREAD_LOCAL = threading.local()
+    _THREAD_LOCAL.retry_counter = 0
+
+    def __init__(self, size=10, name=None, *args, **kwargs):
+        self._pool = queue.Queue(self._HARD_LIMIT)
+        self._size = size if 0 < size < self._HARD_LIMIT else self._HARD_LIMIT
+        self._name = name if name else '-'.join(
+            [kwargs.get('host', 'localhost'), str(kwargs.get('port', 3306)),
+             kwargs.get('user', ''), kwargs.get('database', '')])
+            
+        for _ in range(self._size):
+            conn = Connection(*args, **kwargs)
+            conn._pool = self
+            self._pool.put(conn)
 
     def get_connection(self, timeout=1, retry=5):
         pass 
