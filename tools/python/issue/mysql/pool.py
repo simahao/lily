@@ -20,12 +20,12 @@ class Connection(pymysql.connections.Connection):
         self.kwargs = kwargs
 
     def __exit__(self, exc_type, exc_value, trace):
-        pymysql.connections.Connection.__exit__(self, exc_type, exc_value, trace)
+        # pymysql.connections.Connection.__exit__(self, exc_type, exc_value, trace)
         if self._pool:
             if not exc_type:
                 self._pool.return_connection(self)
             else:
-                self._pool.return_connection(self, self._recreate(*self.args, **self.kwargs))
+                self._pool.return_connection(self._recreate(*self.args, **self.kwargs))
                 self._pool = None
                 try:
                     self.close()
@@ -35,7 +35,7 @@ class Connection(pymysql.connections.Connection):
 
     def _recreate(self, *args, **kwargs):
         conn = Connection(*args, **kwargs)
-        logger.debug('create new connection due to pool(%s) lack of resource', self._pool.name)
+        logger.debug('create new connection due to pool(%s) lack of resource', self._pool._name)
         return conn
 
     def close(self):
@@ -49,9 +49,9 @@ class Connection(pymysql.connections.Connection):
         else:
             pymysql.connections.Connection.close(self)
 
-    def query(self, sql, args=None, dictcursor=False, return_one=False, exec_many=False):
+    def querydb(self, sql, args=None, dictcursor=False, return_one=False, exec_many=False):
         """
-        :param str query: Query to execute.
+        :param str sql: Query to execute.
         :param args: parameters used with query. (optional)
         :type args: tuple, list or dict
         :return: Number of affected rows
@@ -68,13 +68,40 @@ class Connection(pymysql.connections.Connection):
             cur = self.cursor() if dictcursor is False else self.cursor(pymysql.cursors.DictCursor)
             try:
                 if exec_many:
-                    cur.execute_many(sql, args)
+                    cur.executemany(sql, args)
                 else:
                     cur.execute(sql, args)
             except Exception as e:
                 logger.error("error type:{%s}, error message: {%s}", e.__class__.__name__, e)
             return cur.fetchone() if return_one else cur.fetchall()
 
+    def updatedb(self, sql, args=None, exec_many=False):
+        """
+        :param str sql: update/insert to execute.
+        :param args: parameters used with query. (optional)
+        :type args: tuple, list or dict
+        If args is a list or tuple, %s can be used as a placeholder in the query.
+        If args is a dict, %(name)s can be used as a placeholder in the query.
+
+        insert one record
+        sql=" insert into USER values (%s,%s,%s,%s)"
+        params=(张三，18，男，北京)
+
+        insert multiply records
+        sql=" insert into USER values (%s,%s,%s,%s)"
+        params=[(张三，18，男，北京), (李四，19，女，北京)]
+        """
+        with self:
+            cur = self.cursor()
+            try:
+                if exec_many:
+                    cur.executemany(sql, args)
+                else:
+                    cur.execute(sql, args)
+                self.commit()
+            except Exception as e:
+                logger.error("error type:{%s}, error message: {%s}", e.__class__.__name__, e)
+                self.rollback()
 
 class ConnectionPool:
 
@@ -129,10 +156,16 @@ class GetConnectionFromPoolError(Exception):
 
 
 if __name__ == "__main__":
-    config = {'host': '172.27.234.197', 'port': 3306, 'user': 'root', 'password': 'root', 'database': 'mysql'}
+    #config = {'host': '172.27.234.197', 'port': 3306, 'user': 'root', 'password': 'root', 'database': 'mysql'}
+    config = {'host': '192.168.128.128', 'port': 3306, 'user': 'gitea', 'password': 'gitea', 'database': 'gitea'}
     pool = ConnectionPool(name='pool', **config)
-    print(pool.size())
     conn = pool.get_connection()
-    result = conn.query("select * from sys_config")
+    #result = conn.query("select * from sys_config")
+    result = conn.querydb("select * from repository where id = {}".format(4))
     for row in result:
         print(row)
+
+    conn = pool.get_connection()
+    data = [('abc', 18), ('def', 19)]
+    # data = ('abc', 18)
+    conn.updatedb("insert into test values (%s, %s)", data, exec_many=True)
