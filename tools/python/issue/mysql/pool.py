@@ -20,7 +20,6 @@ class Connection(pymysql.connections.Connection):
         self.kwargs = kwargs
 
     def __exit__(self, exc_type, exc_value, trace):
-        # pymysql.connections.Connection.__exit__(self, exc_type, exc_value, trace)
         if self._pool:
             if not exc_type:
                 self._pool.return_connection(self)
@@ -32,6 +31,8 @@ class Connection(pymysql.connections.Connection):
                     logger.warning("close not reusable connection from pool(%s) caused by %s", self._pool.name, exc_value)
                 except Exception:
                     pass
+        else:
+            pymysql.connections.Connection.__exit__(self, exc_type, exc_value, trace)
 
     def _recreate(self, *args, **kwargs):
         conn = Connection(*args, **kwargs)
@@ -165,7 +166,12 @@ if __name__ == "__main__":
     for row in result:
         print(row)
 
-    conn = pool.get_connection()
-    data = [('abc', 18), ('def', 19)]
-    # data = ('abc', 18)
-    conn.updatedb("insert into test values (%s, %s)", data, exec_many=True)
+    conn = Connection(**config)
+    result = conn.querydb("select * from repository where id = {}".format(4))
+    for row in result:
+        print(row)
+
+    # conn = pool.get_connection()
+    # data = [('abc', 18), ('def', 19)]
+    # # data = ('abc', 18)
+    # conn.updatedb("insert into test values (%s, %s)", data, exec_many=True)
