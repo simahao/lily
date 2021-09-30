@@ -1,3 +1,7 @@
+"""
+author:simahao
+"""
+
 import logging
 import queue
 import threading
@@ -154,24 +158,3 @@ class ConnectionPool:
 
 class GetConnectionFromPoolError(Exception):
     """Exception related can't get connection from pool within timeout seconds."""
-
-
-if __name__ == "__main__":
-    #config = {'host': '172.27.234.197', 'port': 3306, 'user': 'root', 'password': 'root', 'database': 'mysql'}
-    config = {'host': '192.168.128.128', 'port': 3306, 'user': 'gitea', 'password': 'gitea', 'database': 'gitea'}
-    pool = ConnectionPool(name='pool', **config)
-    conn = pool.get_connection()
-    #result = conn.query("select * from sys_config")
-    result = conn.querydb("select * from repository where id = {}".format(4))
-    for row in result:
-        print(row)
-
-    conn = Connection(**config)
-    result = conn.querydb("select * from repository where id = {}".format(4))
-    for row in result:
-        print(row)
-
-    # conn = pool.get_connection()
-    # data = [('abc', 18), ('def', 19)]
-    # # data = ('abc', 18)
-    # conn.updatedb("insert into test values (%s, %s)", data, exec_many=True)
