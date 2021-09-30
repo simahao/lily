@@ -428,18 +428,20 @@ trusted-host = 172.27.234.197
         password=Dev2Dev2
         ```
 
-    - 工程中新建setup.py文件
+    注意 [nexus]仓库地址结尾要包含'/'，否则无法upload
 
+    - 工程中新建setup.py文件
+    
         ```python
         import sys
-
+    
         if sys.version_info < (2, 7):
             print(sys.stderr, "{}: need Python 2.7 or later.".format(sys.argv[0]))
             print(sys.stderr, "Your Python is {}".format(sys.version))
             sys.exit(1)
 
         from setuptools import setup, find_packages
-
+    
         setup(
             name="testnexus",
             version="1.0.0",
@@ -477,7 +479,7 @@ trusted-host = 172.27.234.197
     - 上传nexus
 
         ```twine upload -r nexus dist/*```
-
+    
     - references
       - https://packaging.python.org/tutorials/packaging-projects/#setup-py
       - https://twine.readthedocs.io/en/latest/
