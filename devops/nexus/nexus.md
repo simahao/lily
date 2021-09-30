@@ -302,7 +302,7 @@ Nexus3的私有仓库管理类型主要三种：
 
     ```shell
     #!/bin/bash
-  
+    
     find . -name "*.lastUpdated*" -print -exec rm -rf {} \;
     or
     find . -name "*.lastUpdated*" -print | xargs rm -rf
@@ -423,7 +423,7 @@ trusted-host = 172.27.234.197
         username=dev2
         password=Dev2Dev2
         [nexus]
-        repository=http://172.27.234.197:8082/nexus3/repository/pypi-hosted
+        repository=http://172.27.234.197:8082/nexus3/repository/pypi-hosted/
         username=dev2
         password=Dev2Dev2
         ```
