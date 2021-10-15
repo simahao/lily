@@ -407,82 +407,71 @@ trusted-host = 172.27.234.197
 
     ```pip install twine```
 
+    ```pip install --upgrade setuptools wheel twine```
+
   - 修改.pypirc
 
     - windows：%homepath%/.pypirc
 
     - linux：~/.pypirc
-
+  
         ```ini
         [distutils]
         index-servers =
             pypi
-            nexus
+            hosted
         [pypi]
-        repository=http://172.27.234.197:8082/nexus3/repository/pypi-public/pypi
+        repository=http://172.27.234.197:8082/nexus3/repository/pypi-public/pypi/
         username=dev2
         password=Dev2Dev2
-        [nexus]
+        [hosted]
         repository=http://172.27.234.197:8082/nexus3/repository/pypi-hosted/
         username=dev2
-        password=Dev2Dev2
+      password=Dev2Dev2
         ```
 
     注意 [nexus]仓库地址结尾要包含'/'，否则无法upload
-
+  
     - 工程中新建setup.py文件
     
         ```python
-        import sys
-    
-        if sys.version_info < (2, 7):
-            print(sys.stderr, "{}: need Python 2.7 or later.".format(sys.argv[0]))
-            print(sys.stderr, "Your Python is {}".format(sys.version))
-            sys.exit(1)
-
-        from setuptools import setup, find_packages
-    
-        setup(
-            name="testnexus",
-            version="1.0.0",
-            license="BSD",
-            description="A python library adding a json log formatter",
-            package_dir={'': 'src'},
-            packages=find_packages("src", exclude="tests"),
-            install_requires=["setuptools", "thrift==0.10.0", "requests >= 2.13.0", "urllib3 >= 1.25.3"],
-            classifiers=[
-                'Development Status :: 3 - Alpha',
-                'Intended Audience :: Developers',
-                'License :: OSI Approved :: BSD License',
-                'Operating System :: OS Independent',
-                'Programming Language :: Python',
-                'Programming Language :: Python :: 2',
-                'Programming Language :: Python :: 2.7',
-                'Programming Language :: Python :: 3',
-                'Programming Language :: Python :: 3.6',
-                'Programming Language :: Python :: 3.7',
-                'Programming Language :: Python :: 3.8',
-                'Programming Language :: Python :: 3.9',
-                'Topic :: System :: Logging',
-            ]
+        import setuptools
+        
+        readme = 'README.md'
+        
+      setuptools.setup(
+           name='pool',
+         version='0.0.1',
+           author='simahao',
+           py_modules=['pool'],
+           license='MIT',
+           python_requires='>=3.4',
+           install_requires=['pymysql>=1.0.2'],
+           keywords=[
+              'pymysql pool',
+              'mysql connection pool'
+           ],
+           packages=setuptools.find_packages()
         )
         ```
-
-    - 安装
-
-        ```python setup.py install```
-
-    - 生成压缩包
-
-        ```python setup.py sdist```
-
-    - 上传nexus
-
-        ```twine upload -r nexus dist/*```
+        
+    - 本地安装
     
-    - references
+        ```python setup.py install```
+    
+    - 生成压缩包
+    
+        ```python setup.py sdist bdist_wheel```
+    
+    - 上传nexus
+    
+        ```twine upload -r hosted dist/*```
+    
+      注意：-r hosted代表使用.pypirc中section为hosted的地址进行上传
+    
+- references
       - https://packaging.python.org/tutorials/packaging-projects/#setup-py
-      - https://twine.readthedocs.io/en/latest/
+  - https://twine.readthedocs.io/en/latest/
 
 ### 相关说明
 
