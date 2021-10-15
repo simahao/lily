@@ -1,8 +1,8 @@
-from setuptools import setup
+import setuptools
 
 readme = 'README.md'
 
-setup(
+setuptools.setup(
    name='pool',
    version='0.0.1',
    author='simahao',
@@ -13,5 +13,6 @@ setup(
    keywords=[
       'pymysql pool',
       'mysql connection pool'
-   ]
+   ],
+   packages=setuptools.find_packages()
 )
