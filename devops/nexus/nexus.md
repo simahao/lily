@@ -405,8 +405,6 @@ trusted-host = 172.27.234.197
 
   - 安装twine
 
-    ```pip install twine```
-
     ```pip install --upgrade setuptools wheel twine```
 
   - 修改.pypirc
@@ -414,7 +412,7 @@ trusted-host = 172.27.234.197
     - windows：%homepath%/.pypirc
 
     - linux：~/.pypirc
-  
+
         ```ini
         [distutils]
         index-servers =
@@ -428,12 +426,12 @@ trusted-host = 172.27.234.197
         repository=http://172.27.234.197:8082/nexus3/repository/pypi-hosted/
         username=dev2
       password=Dev2Dev2
-        ```
+      ```
 
     注意 [nexus]仓库地址结尾要包含'/'，否则无法upload
-  
+
     - 工程中新建setup.py文件
-    
+
         ```python
         import setuptools
         
@@ -453,22 +451,22 @@ trusted-host = 172.27.234.197
            ],
            packages=setuptools.find_packages()
         )
-        ```
-        
-    - 本地安装
-    
-        ```python setup.py install```
-    
+      ```
+      
     - 生成压缩包
-    
+
         ```python setup.py sdist bdist_wheel```
-    
+
+    - 本地安装
+
+        ```pip install sdist/xxxxxxx.whl```
+
     - 上传nexus
-    
+
         ```twine upload -r hosted dist/*```
-    
+
       注意：-r hosted代表使用.pypirc中section为hosted的地址进行上传
-    
+
 - references
       - https://packaging.python.org/tutorials/packaging-projects/#setup-py
   - https://twine.readthedocs.io/en/latest/
