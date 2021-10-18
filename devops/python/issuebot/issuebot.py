@@ -93,11 +93,22 @@ class IssueBot():
         return  base + '/' + repo + '?token=' + token
 
     def gen_tasks(self):
-        pass
+        self._query(db=self._config[self._projectid]['database'])
 
     def _query(self, db):
         conn = self._pool.get_connection()
-        pass
+        dbs = self._config[self._projectid]['database'].split(',')
+        status_list = self._config['Status']['status'].split(',')
+        status_condition = ''
+        for idx, status in enumerate(status_list):
+            status_condition += "'{}'".format(status) if idx == 0 else ", '{}'".format(status)
+        print(status_condition)
+
+        for db in dbs:
+            sql = "select * from {}.test where status in ({})".format(db, status_condition)
+            results = conn.querydb(sql=sql)
+            
+
     def _ser(self):
         pass
 
@@ -114,19 +125,22 @@ class IssueBot():
 
 if __name__ == "__main__":
     config = ConfigParser()
-    config.read(os.path.dirname(__file__) + '/' + 'issue.ini')
+    conf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'issue.ini')
+    config.read(filenames=conf_path, encoding='utf8')
 
     host = config['Mysql']['host']
     port = int(config['Mysql']['port'])
     user = config['Mysql']['user']
     password = config['Mysql']['password']
-    database = config['Mysql']['database']
+    # database = config['Mysql']['database']
 
-    conn_str = {'host': host, 'port': port, 'user': user, 'password': password, 'database': database}
+    conn_str = {'host': host, 'port': port, 'user': user, 'password': password}
     pool = ConnectionPool(name='pool', **conn_str)
 
 
     project_counts = config['Organazations']['counts']
 
-    with Pool(processes=project_counts) as process:
-        pass
+    bot = IssueBot(projectid='Octopus', config=config, pool=pool)
+    bot.gen_tasks()
+    # with Pool(processes=project_counts) as process:
+    #     pass
