@@ -19,14 +19,16 @@ class MysqlException(Exception):
 class Issue:
 
     # bind four property
-    __slots__ = ('__id', '__title', '__content', '__status')
+    __slots__ = ('__id', '__title', '__content', '__status', '__severity',  '__reason')
 
     # Constructor
-    def __init__(self, id, title, content, status):
+    def __init__(self, id, title, content, status, severity, reason):
         self.__id = id
         self.__title = title
         self.__content = content
         self.__status = status
+        self.__severity = severity
+        self.__reason = reason
 
     @property
     def id(self):
@@ -60,6 +62,22 @@ class Issue:
     def status(self, status):
         self.__status = status
 
+    @property
+    def severity(self):
+        return self.__severity
+
+    @severity.setter
+    def severity(self, severity):
+        self.__severity = severity
+
+    @property
+    def reason(self):
+        return self.__reason
+
+    @reason.setter
+    def reason(self, reason):
+        self.__reason = reason
+
     # toString()
     def __str__(self):
         return "id:%d title:%s content:%s status:%s" % (self.__di, self.__title, self.__content, self.__status)
@@ -67,7 +85,7 @@ class Issue:
     # equals
     def __eq__(self, other):
         if (self.__id == other.id
-            and self.__title == other.title 
+            and self.__title == other.title
             and self.__content == other.content
             and self.__status == other.status):
             return True
@@ -86,34 +104,33 @@ class IssueBot():
         self._logger = logging.getLogger(projectid)
         self._url = self._get_gitea_api_url()
 
-    def _get_gitea_api_url(self):
-        base = self._config['Gitea']['url'] 
+    def _get_gitea_api_url(self) -> str:
+        base = self._config['Gitea']['url']
         repo = self._config[self._projectid]['api']
         token = self._config['Gitea']['token']
         return  base + '/' + repo + '?token=' + token
 
-    def gen_tasks(self):
-        self._query(db=self._config[self._projectid]['database'])
 
-    def _query(self, db):
+    @retry(tries=10, delay=10, jitter=5)
+    def gen_tasks(self) -> tuple:
         conn = self._pool.get_connection()
         dbs = self._config[self._projectid]['database'].split(',')
         status_list = self._config['Status']['status'].split(',')
         status_condition = ''
         for idx, status in enumerate(status_list):
             status_condition += "'{}'".format(status) if idx == 0 else ", '{}'".format(status)
-        print(status_condition)
 
+        results = ()
         for db in dbs:
             sql = "select * from {}.test where status in ({})".format(db, status_condition)
-            results = conn.querydb(sql=sql)
-            
+            rows = conn.querydb(sql=sql)
+            for row in rows:
+        return results
 
-    def _ser(self):
-        pass
+
 
     @retry(tries=10, delay=10, jitter=5)
-    def _gen_issue(self, title: str, content: str) -> Response: 
+    def _gen_issue(self, title: str, content: str) -> Response:
         data = {'title': title, 'body': content}
         res = post(url=self._url, data=data)
         if res.status_code != 200:

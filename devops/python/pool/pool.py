@@ -34,7 +34,8 @@ class Connection(pymysql.connections.Connection):
                     self.close()
                     logger.warning("close not reusable connection from pool(%s) caused by %s", self._pool.name, exc_value)
                 except Exception:
-                    pass
+                    logger.warning("close connection failed from pool(%s)", self._pool.name)
+                    raise PoolException("close connection failed")
         else:
             pymysql.connections.Connection.__exit__(self, exc_type, exc_value, trace)
 
@@ -78,6 +79,7 @@ class Connection(pymysql.connections.Connection):
                     cur.execute(sql, args)
             except Exception as e:
                 logger.error("error type:{%s}, error message: {%s}", e.__class__.__name__, e)
+                raise PoolException("query db failed")
             return cur.fetchone() if return_one else cur.fetchall()
 
     def updatedb(self, sql, args=None, exec_many=False):
@@ -107,6 +109,7 @@ class Connection(pymysql.connections.Connection):
             except Exception as e:
                 logger.error("error type:{%s}, error message: {%s}", e.__class__.__name__, e)
                 self.rollback()
+                raise PoolException("update db failed")
 
 class ConnectionPool:
 
@@ -152,9 +155,13 @@ class ConnectionPool:
             logger.debug("put connection back to pool(%s)", self._name)
         except queue.Full:
             logger.warning("put connection to pool(%s) error, pool is full, size:%d", self._name, self.size())
+            raise PoolException("put connection failed")
 
     def size(self):
         return self._pool.qsize()
 
 class GetConnectionFromPoolError(Exception):
     """Exception related can't get connection from pool within timeout seconds."""
+
+class PoolException(Exception):
+    """Exception related DML"""
