@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import time
@@ -6,7 +5,7 @@ from configparser import ConfigParser
 from multiprocessing import Process
 
 from pool import ConnectionPool
-from requests import Request, Response, post
+from requests import Response, post
 from retry import retry
 
 logging.basicConfig(level=logging.WARN, format='%(levelname)8s %(asctime)s: %(message)s', datefmt='%m-%d %H:%M:%S')
