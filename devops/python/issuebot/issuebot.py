@@ -98,11 +98,15 @@ class IssueBot():
         'accept': 'application/json'}
 
     def __init__(self, projectid: str, config: ConfigParser, pool: ConnectionPool):
+        # e.x. Octopus
         self._projectid = projectid
         self._config = config
         self._pool = pool
         self._logger = logging.getLogger(projectid)
         self._url = self._get_gitea_api_url()
+        # save issue id that has been sent to gitea
+        self._project_db = ConfigParser()
+        self._project_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), projectid)
 
     def _get_gitea_api_url(self) -> str:
         base = self._config['Gitea']['url']
@@ -122,12 +126,24 @@ class IssueBot():
 
         results = ()
         for db in dbs:
+            ids = self._get_ids(dbname=db)
             sql = "select * from {}.test where status in ({})".format(db, status_condition)
             rows = conn.querydb(sql=sql)
             for row in rows:
+                pass
         return results
 
+    def _get_ids(self, dbname: str) -> list:
+        self._project_db.read(filenames=self._project_path, encoding='utf8')
+        return self._project_db[dbname]['id'].split(',')
 
+    def _sync_ids(self, dbname: str, new_ids: str):
+        self._project_db.read(filenames=self._project_path, encoding='utf8')
+        if self._project_db.has_section(dbname) is False:
+            self._project_db.add_section(dbname)
+        self._project_db.set(dbname, 'id', new_ids)
+        with open(self._project_path) as configfile:
+            self._project_db.write(configfile)
 
     @retry(tries=10, delay=10, jitter=5)
     def _gen_issue(self, title: str, content: str) -> Response:

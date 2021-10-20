@@ -1,4 +1,6 @@
 import logging
+import os
+from configparser import ConfigParser
 
 from retry import retry
 
@@ -109,6 +111,41 @@ def test4():
         print(e.content)
         print(e.status)
 
+def test5():
+    l1 = [('c','d'),('c','e'),('a','b'),('a', 'd')]
+    l2 = [('a','c'),('b','d')]
+    starters = set(x for x, _ in l2)
+
+    x = [(x, y) for x, y in l1 if x not in starters] + l2
+    print(x)
+
+def test6():
+    str1 = "1,2,3,4,5,6,7,8".split(sep=',')
+    print(str1)
+    tup = tuple(str1)
+    print(tup)
+
+def test7():
+    conf = ConfigParser()
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Octopus')
+    conf.read(filenames=path, encoding='utf8')
+    try:
+        ids = conf['db1']['id'].split(sep=',')
+    except Exception:
+        return []
+    else:
+        return ids
+
+def test8():
+    conf = ConfigParser()
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Octopus')
+    conf.read(filenames=path, encoding='utf8')
+    if conf.has_section('db4') is False:
+        conf.add_section('db4')
+    conf.set('db4', 'id2', '1,2,3,4')
+
+    with open(path, 'w') as configfile:
+        conf.write(configfile)
 
 if __name__ == "__main__":
-    test4()
+    test8()
