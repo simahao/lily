@@ -1,8 +1,9 @@
 import json
 import logging
 import os
+import time
 from configparser import ConfigParser
-from multiprocessing import Pool
+from multiprocessing import Process
 
 from pool import ConnectionPool
 from requests import Request, Response, post
@@ -115,8 +116,7 @@ class IssueBot():
         return  base + '/' + repo + '?token=' + token
 
 
-    @retry(tries=10, delay=10, jitter=5)
-    def gen_tasks(self) -> tuple:
+    def do_tasks(self):
         conn = self._pool.get_connection()
         dbs = self._config[self._projectid]['database'].split(',')
         status_list = self._config['Status']['status'].split(',')
@@ -124,37 +124,54 @@ class IssueBot():
         for idx, status in enumerate(status_list):
             status_condition += "'{}'".format(status) if idx == 0 else ", '{}'".format(status)
 
-        results = ()
-        for db in dbs:
-            ids = self._get_ids(dbname=db)
-            sql = "select * from {}.test where status in ({})".format(db, status_condition)
-            rows = conn.querydb(sql=sql)
-            for row in rows:
-                pass
-        return results
+        while True:
+            for db in dbs:
+                ids = self._get_ids(dbname=db)
+                # id,title,content,status,severity,reason
+                sql = "select * from {}.test where status in ({})".format(db, status_condition)
+                rows = conn.querydb(sql=sql)
+                for row in rows:
+                    # if this id has been handled, get next data 
+                    if row[0] in ids:
+                        continue 
+                    else:
+                        # update id file and send gitea request
+                        self._gen_issue(Issue(row[0], row[1], row[2], row[3], row[4], row[5]))
+                        tmp = ids + [row[0]]
+                        str_ids = [str(x) for x in tmp]
+                        sep = ','
+                        self._sync_ids(dbname=db, new_ids=sep.join(str_ids))
+            time.sleep(self._config['App']['Interval'])
 
     def _get_ids(self, dbname: str) -> list:
+        """get id list by section->option->value from local file"""
         self._project_db.read(filenames=self._project_path, encoding='utf8')
         return self._project_db[dbname]['id'].split(',')
 
+    @retry(tries=10, delay=10, jitter=5)
     def _sync_ids(self, dbname: str, new_ids: str):
         self._project_db.read(filenames=self._project_path, encoding='utf8')
+        # if section is not exist, add section firstly
         if self._project_db.has_section(dbname) is False:
             self._project_db.add_section(dbname)
+        # update section->option->value
         self._project_db.set(dbname, 'id', new_ids)
         with open(self._project_path) as configfile:
             self._project_db.write(configfile)
 
     @retry(tries=10, delay=10, jitter=5)
-    def _gen_issue(self, title: str, content: str) -> Response:
-        data = {'title': title, 'body': content}
+    def _gen_issue(self, issue: Issue) -> Response:
+        data = {'id': issue.id,
+                'title': issue.title,
+                'content': issue.content,
+                'status': issue.status,
+                'severity': issue.severity,
+                'reason': issue.reason}
+
         res = post(url=self._url, data=data)
         if res.status_code != 200:
-            raise GiteaException("call gitea api failed, title={}, content={}".format(title, content))
+            raise GiteaException("call gitea api failed, id={}, title={}".format(issue.id, issue.title))
         return res
-
-    def bot_work(self):
-        pass
 
 if __name__ == "__main__":
     config = ConfigParser()
@@ -173,7 +190,8 @@ if __name__ == "__main__":
 
     project_counts = config['Organazations']['counts']
 
-    bot = IssueBot(projectid='Octopus', config=config, pool=pool)
-    bot.gen_tasks()
-    # with Pool(processes=project_counts) as process:
-    #     pass
+    for idx in range(0, project_counts):
+        bot = IssueBot(projectid=config['Organazations']['org' + idx], config=config, pool=pool)
+        p = Process(target=bot.do_tasks)
+        p.start()
+        p.join()

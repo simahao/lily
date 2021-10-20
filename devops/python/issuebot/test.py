@@ -147,5 +147,12 @@ def test8():
     with open(path, 'w') as configfile:
         conf.write(configfile)
 
+def test9():
+    l = [1,2,3,4,5]
+    n = l + [6]
+    str_n = [str(x) for x in n]
+    sep = ','
+    print(sep.join(str_n))
+
 if __name__ == "__main__":
-    test8()
+    test9()
