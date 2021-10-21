@@ -19,16 +19,19 @@ class MysqlException(Exception):
 class Issue:
 
     # bind four property
-    __slots__ = ('__id', '__title', '__content', '__status', '__severity',  '__reason')
+    # defect_desc: ddl is defect_description
+    # reason: ddl is primary_reason
+    __slots__ = ('__id', '__title', '__defect_desc', '__status', '__severity',  '__reason', '__subsystem')
 
     # Constructor
-    def __init__(self, id, title, content, status, severity, reason):
+    def __init__(self, id, title, defect_desc, status, severity, reason, subsystem):
         self.__id = id
         self.__title = title
-        self.__content = content
+        self.__defect_desc = defect_desc
         self.__status = status
         self.__severity = severity
         self.__reason = reason
+        self.__subsystem = subsystem
 
     @property
     def id(self):
@@ -47,12 +50,12 @@ class Issue:
         self.__title = title
 
     @property
-    def content(self):
-        return self.__content
+    def defect_desc(self):
+        return self.__defect_desc
 
-    @content.setter
-    def content(self, content):
-        self.__content = content
+    @defect_desc.setter
+    def defect_desc(self, defect_desc):
+        self.__defect_desc = defect_desc
 
     @property
     def status(self):
@@ -78,19 +81,21 @@ class Issue:
     def reason(self, reason):
         self.__reason = reason
 
+    @property
+    def subsystem(self):
+        return self.__subsystem
+
+    @subsystem.setter
+    def subsystem(self, subsystem):
+        self.__subsystem = subsystem
+
     # toString()
     def __str__(self):
-        return "id:%d title:%s content:%s status:%s" % (self.__di, self.__title, self.__content, self.__status)
+        return "id:%d title:%s defect_description:%s status:%s" % (self.__id, self.__title, self.__defect_desc, self.__status)
 
     # equals
     def __eq__(self, other):
-        if (self.__id == other.id
-            and self.__title == other.title
-            and self.__content == other.content
-            and self.__status == other.status):
-            return True
-        else:
-            return False
+        return True if self.__id == other.id else False
 
 class IssueBot():
 
@@ -126,16 +131,15 @@ class IssueBot():
         while True:
             for db in dbs:
                 ids = self._get_ids(dbname=db)
-                # id,title,content,status,severity,reason
-                sql = "select * from {}.test where status in ({})".format(db, status_condition)
+                sql = "select id,title,defect_description,status,severity,primary_reason,subsystem from {}.test where status in ({})".format(db, status_condition)
                 rows = conn.querydb(sql=sql)
                 for row in rows:
-                    # if this id has been handled, get next data 
+                    # if this id has been handled, get next data
                     if row[0] in ids:
-                        continue 
+                        continue
                     else:
                         # update id file and send gitea request
-                        self._gen_issue(Issue(row[0], row[1], row[2], row[3], row[4], row[5]))
+                        self._gen_issue(Issue(row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
                         tmp = ids + [row[0]]
                         str_ids = [str(x) for x in tmp]
                         sep = ','
@@ -162,10 +166,11 @@ class IssueBot():
     def _gen_issue(self, issue: Issue) -> Response:
         data = {'id': issue.id,
                 'title': issue.title,
-                'content': issue.content,
+                'defect_desc': issue.defect_desc,
                 'status': issue.status,
                 'severity': issue.severity,
-                'reason': issue.reason}
+                'reason': issue.reason,
+                'subsystem': issue.subsystem}
 
         res = post(url=self._url, data=data)
         if res.status_code != 200:

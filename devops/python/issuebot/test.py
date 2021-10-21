@@ -1,5 +1,7 @@
 import logging
+import multiprocessing
 import os
+import time
 from configparser import ConfigParser
 
 from retry import retry
@@ -154,5 +156,28 @@ def test9():
     sep = ','
     print(sep.join(str_n))
 
+def test10():
+    i = 2
+    return True if i == 1 else False
+
+
+def foo(n):
+    time.sleep(1)
+    print('In process', n, os.getpid())
+    return n
+
+
+def bar(*args):
+    print('>>done: ', args, os.getpid())
+
+
+
 if __name__ == "__main__":
-    test9()
+    pool = multiprocessing.Pool(processes=3)
+    print('主进程: ', os.getpid())
+    for i in range(10):
+    # pool.apply(func=foo, args=(i, ))
+        pool.apply_async(func=foo, args=(i, ), callback=bar)
+    print('end')
+    pool.close()
+    pool.join()
