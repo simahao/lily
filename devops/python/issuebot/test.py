@@ -173,13 +173,14 @@ class aaa:
 
 
 if __name__ == "__main__":
-    obj = aaa()
-    # pool = multiprocessing.Pool(processes=3)
-    print('主进程: ', os.getpid())
-    with multiprocessing.Pool(processes=3) as pool:
-        for i in range(3):
-    # pool.apply(func=foo, args=(i, ))
-            pool.apply_async(func=obj.foo, args=(i, ))
-    print('end')
-    pool.close()
-    pool.join()
+    test8()
+    # obj = aaa()
+    # # pool = multiprocessing.Pool(processes=3)
+    # print('主进程: ', os.getpid())
+    # with multiprocessing.Pool(processes=3) as pool:
+    #     for i in range(3):
+    # # pool.apply(func=foo, args=(i, ))
+    #         pool.apply_async(func=obj.foo, args=(i, ))
+    # print('end')
+    # pool.close()
+    # pool.join()

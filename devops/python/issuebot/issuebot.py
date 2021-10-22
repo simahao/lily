@@ -145,7 +145,7 @@ class IssueBot():
                         str_ids = [str(x) for x in tmp]
                         sep = ','
                         self._sync_ids(dbname=db, new_ids=sep.join(str_ids))
-            time.sleep(self._config['App']['Interval'])
+            time.sleep(int(self._config['App']['Interval']))
 
     def _get_ids(self, dbname: str) -> list:
         """get id list by section->option->value from local file"""
@@ -160,7 +160,7 @@ class IssueBot():
             self._project_db.add_section(dbname)
         # update section->option->value
         self._project_db.set(dbname, 'id', new_ids)
-        with open(self._project_path) as idfile:
+        with open(self._project_path, 'w') as idfile:
             self._project_db.write(idfile)
 
     @retry(tries=10, delay=10, jitter=5)
