@@ -160,24 +160,26 @@ def test10():
     i = 2
     return True if i == 1 else False
 
+class aaa:
+    def foo(self, n):
+        time.sleep(1)
+        print('In process', n, os.getpid())
+        return n
 
-def foo(n):
-    time.sleep(1)
-    print('In process', n, os.getpid())
-    return n
 
-
-def bar(*args):
-    print('>>done: ', args, os.getpid())
+    def bar(self, *args):
+        print('>>done: ', args, os.getpid())
 
 
 
 if __name__ == "__main__":
-    pool = multiprocessing.Pool(processes=3)
+    obj = aaa()
+    # pool = multiprocessing.Pool(processes=3)
     print('主进程: ', os.getpid())
-    for i in range(10):
+    with multiprocessing.Pool(processes=3) as pool:
+        for i in range(3):
     # pool.apply(func=foo, args=(i, ))
-        pool.apply_async(func=foo, args=(i, ), callback=bar)
+            pool.apply_async(func=obj.foo, args=(i, ))
     print('end')
     pool.close()
     pool.join()

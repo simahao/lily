@@ -2,7 +2,7 @@ import logging
 import os
 import time
 from configparser import ConfigParser
-from multiprocessing import Process
+from multiprocessing import Pool, Process
 
 from pool import ConnectionPool
 from requests import Response, post
@@ -120,7 +120,8 @@ class IssueBot():
         return  base + '/' + repo + '?token=' + token
 
 
-    def do_tasks(self):
+    def do_task(self):
+        print("start task...")
         conn = self._pool.get_connection()
         dbs = self._config[self._projectid]['database'].split(',')
         status_list = self._config['Status']['status'].split(',')
@@ -149,7 +150,7 @@ class IssueBot():
     def _get_ids(self, dbname: str) -> list:
         """get id list by section->option->value from local file"""
         self._project_db.read(filenames=self._project_path, encoding='utf8')
-        return self._project_db[dbname]['id'].split(',')
+        return self._project_db[dbname]['id'].split(',') if self._project_db.has_section(dbname) else []
 
     @retry(tries=10, delay=10, jitter=5)
     def _sync_ids(self, dbname: str, new_ids: str):
@@ -159,8 +160,8 @@ class IssueBot():
             self._project_db.add_section(dbname)
         # update section->option->value
         self._project_db.set(dbname, 'id', new_ids)
-        with open(self._project_path) as configfile:
-            self._project_db.write(configfile)
+        with open(self._project_path) as idfile:
+            self._project_db.write(idfile)
 
     @retry(tries=10, delay=10, jitter=5)
     def _gen_issue(self, issue: Issue) -> Response:
@@ -171,11 +172,11 @@ class IssueBot():
                 'severity': issue.severity,
                 'reason': issue.reason,
                 'subsystem': issue.subsystem}
-
-        res = post(url=self._url, data=data)
-        if res.status_code != 200:
-            raise GiteaException("call gitea api failed, id={}, title={}".format(issue.id, issue.title))
-        return res
+        return None
+        # res = post(url=self._url, data=data, timeout=10)
+        # if res.status_code != 200:
+        #     raise GiteaException("call gitea api failed, id={}, title={}".format(issue.id, issue.title))
+        # return res
 
 if __name__ == "__main__":
     config = ConfigParser()
@@ -186,16 +187,23 @@ if __name__ == "__main__":
     port = int(config['Mysql']['port'])
     user = config['Mysql']['user']
     password = config['Mysql']['password']
-    # database = config['Mysql']['database']
 
     conn_str = {'host': host, 'port': port, 'user': user, 'password': password}
     pool = ConnectionPool(name='pool', **conn_str)
 
 
-    project_counts = config['Organazations']['counts']
+    project_counts = int(config['Organazations']['counts'])
 
-    for idx in range(0, project_counts):
-        bot = IssueBot(projectid=config['Organazations']['org' + idx], config=config, pool=pool)
-        p = Process(target=bot.do_tasks)
-        p.start()
-        p.join()
+    bots = []
+    for idx in range(project_counts):
+        bots.append(IssueBot(projectid=config['Organazations']['org' + str(idx)], config=config, pool=pool))
+
+    bots[0].do_task()
+    # ps = []
+    # for i in range(project_counts):
+    #     p = Process(target=bots[i].do_task)
+    #     p.start()
+    #     ps.append(p)
+
+    # for i in range(project_counts):
+    #     ps[i].join()
