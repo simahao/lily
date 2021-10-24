@@ -157,23 +157,21 @@ def test9():
     print(sep.join(str_n))
 
 def test10():
-    i = 2
-    return True if i == 1 else False
+    print("start ... {}".format("abcd"))
 
-class aaa:
-    def foo(self, n):
-        time.sleep(1)
-        print('In process', n, os.getpid())
-        return n
-
-
-    def bar(self, *args):
-        print('>>done: ', args, os.getpid())
-
+# class Bot:
+#     @classmethod
+#     def init(cls):
+#         cls.config = ConfigParser()
+#         conf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'issuehome.ini')
+#         cls.config.read(filenames=conf_path, encoding='utf8')
+        
+# class Child(Bot):
+#     def fun(self):
 
 
 if __name__ == "__main__":
-    test8()
+    test10()
     # obj = aaa()
     # # pool = multiprocessing.Pool(processes=3)
     # print('主进程: ', os.getpid())
