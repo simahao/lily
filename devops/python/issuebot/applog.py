@@ -73,5 +73,6 @@ log_config = {
         'handlers': ['console']
     }
 }
-
+# propagate default is true,so message is propagated its parent's logger until root
+# e.x. Octopus flush message to file, and progagate message to root logger, and flush to console
 logging.config.dictConfig(log_config)
