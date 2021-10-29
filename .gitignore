@@ -5,3 +5,4 @@ dist
 .vscode
 *.log
 __pycache__
+emoji
