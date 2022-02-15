@@ -855,7 +855,7 @@ git diff SHA-1 SHA-1' --name-only -z | xargs -0 tar zcf xxx.tar.gz
     ```sh
     git diff topic master or git diff topic..master
     will show the differences between the topic and master branch at that point in time
-
+    
     git diff topic...master
     this will show all the differences between when the topic was made from the branch and after
     ```
@@ -1201,8 +1201,7 @@ important options: conventional-changelog --help
 - make sure CI to pass
 - upgrade package.json(version: "x.x.x")
 - run command: `npm run genlog` or `conventional-changelog -p angular -i CHANGELOG.md -s ...`
-- git commit --amend(commit package.json and CHANGELOG.md)
-- git push
+- git commit -m 'docs: changelog'  (docs type would not been added chagnelog in next time)
 - git tag vX.X.X
 - git push origin vX.X.X
 
