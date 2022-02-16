@@ -145,7 +145,7 @@ Nexus3的私有仓库管理类型主要三种：
         <mirror>
             <id>dev2-nexus3</id>
             <mirrorOf>*</mirrorOf>
-            <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
+            <url>http://172.27.234.197:8083/nexus3/repository/maven-public</url>
         </mirror>
     </mirrors>
     ```
@@ -160,7 +160,7 @@ Nexus3的私有仓库管理类型主要三种：
                 <repository>
                     <!--should same as  mirrors/mirros/id  -->
                     <id>dev2-nexus3</id>
-                    <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
+                    <url>http://172.27.234.197:8083/nexus3/repository/maven-public</url>
                     <releases>
                         <enabled>true</enabled>
                     </releases>
@@ -173,7 +173,7 @@ Nexus3的私有仓库管理类型主要三种：
             <pluginRepositories>
                 <pluginRepository>
                     <id>dev2-nexus3</id>
-                    <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
+                    <url>http://172.27.234.197:8083/nexus3/repository/maven-public</url>
                     <releases>
                         <enabled>true</enabled>
                     </releases>
@@ -203,12 +203,12 @@ Nexus3的私有仓库管理类型主要三种：
             <!--should same as  servers/server/id in settings.xml -->
             <id>dev2-nexus3</id>
             <name>release repository for deployment</name>
-            <url>http://172.27.234.197:8082/nexus3/repository/maven-releases</url>
+            <url>http://172.27.234.197:8083/nexus3/repository/maven-releases</url>
         </repository>
         <snapshotRepository>
             <id>dev2-nexus3</id>
             <name>snapshots repository for deployment</name>
-            <url>http://172.27.234.197:8082/nexus3/repository/maven-snapshots</url>
+            <url>http://172.27.234.197:8083/nexus3/repository/maven-snapshots</url>
         </snapshotRepository>
         </distributionManagement>
         ...
@@ -228,7 +228,7 @@ Nexus3的私有仓库管理类型主要三种：
             <repository>
                 <id>dev2-nexus3</id>
                 <name>dev2 mirror server</name>
-                <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
+                <url>http://172.27.234.197:8083/nexus3/repository/maven-public</url>
                 <releases>
                     <enabled>true</enabled>
                 </releases>
@@ -242,7 +242,7 @@ Nexus3的私有仓库管理类型主要三种：
             <pluginRepository>
                 <id>dev2-nexus3</id>
                 <name>dev2 mirror server</name>
-                <url>http://172.27.234.197:8082/nexus3/repository/maven-public</url>
+                <url>http://172.27.234.197:8083/nexus3/repository/maven-public</url>
                 <releases>
                     <enabled>true</enabled>
                 </releases>
@@ -255,12 +255,12 @@ Nexus3的私有仓库管理类型主要三种：
             <repository>
                 <id>dev2-nexus3</id>
                 <name>release repository for deployment</name>
-                <url>http://172.27.234.197:8082/nexus3/repository/maven-releases</url>
+                <url>http://172.27.234.197:8083/nexus3/repository/maven-releases</url>
             </repository>
             <snapshotRepository>
                 <id>dev2-nexus3</id>
                 <name>snapshotRepository repository for deployment</name>
-                <url>http://172.27.234.197:8082/nexus3/repository/maven-snapshots</url>
+                <url>http://172.27.234.197:8083/nexus3/repository/maven-snapshots</url>
             </snapshotRepository>
         </distributionManagement>
         ...
@@ -324,11 +324,11 @@ Nexus3的私有仓库管理类型主要三种：
 
 - step1:
 
-    ```npm config set registry http://172.27.234.197:8082/nexus3/repository/npm-public```
+    ```npm config set registry http://172.27.234.197:8083/nexus3/repository/npm-public```
 
 - step2:
 
-    ```npm adduser --registry=http://172.27.234.197:8082/nexus3/repository/npm-public```
+    ```npm adduser --registry=http://172.27.234.197:8083/nexus3/repository/npm-public```
 
     按照提示输入```dev2```和```Dev2Dev2```，邮箱输入```abc@dev2.com```，或者其他都可以（第一次写的邮箱，后续就会使用这个email)，如果忘记，可以将~/.npmrc清空，重新执行step1、step2
 
@@ -365,19 +365,19 @@ Nexus3的私有仓库管理类型主要三种：
 
 - 部署
 
-    因为OSS版本不支持直接publish到group仓库，因此需要按照以下步骤执行，注意registry是http://172.27.234.197:8082/nexus3/repository/npm-hosted
+    因为OSS版本不支持直接publish到group仓库，因此需要按照以下步骤执行，注意registry是http://172.27.234.197:8083/nexus3/repository/npm-hosted
 
-  - ```npm adduser --registry=http://172.27.234.197:8082/nexus3/repository/npm-hosted```
+  - ```npm adduser --registry=http://172.27.234.197:8083/nexus3/repository/npm-hosted```
 
   - 修改package.json，添加
 
     ```json
         "publishConfig": {
-        "registry": "http://172.27.234.197:8082/nexus3/repository/npm-hosted"
+        "registry": "http://172.27.234.197:8083/nexus3/repository/npm-hosted"
         }
     ```
 
-  - 执行 ```npm publish```就可以发布到npm-hosted仓库，如果不修改package.json，每次需要执行```npm publish --registry=http://172.27.234.197:8082/nexus3/repository/npm-hosted```
+  - 执行 ```npm publish```就可以发布到npm-hosted仓库，如果不修改package.json，每次需要执行```npm publish --registry=http://172.27.234.197:8083/nexus3/repository/npm-hosted```
 
 ## Pypi
 
@@ -390,8 +390,8 @@ Nexus3的私有仓库管理类型主要三种：
 
 ```ini
 [global]
-index = http://172.27.234.197:8082/nexus3/repository/pypi-public/pypi
-index-url = http://172.27.234.197:8082/nexus3/repository/pypi-public/simple
+index = http://172.27.234.197:8083/nexus3/repository/pypi-public/pypi
+index-url = http://172.27.234.197:8083/nexus3/repository/pypi-public/simple
 trusted-host = 172.27.234.197
 ```
 
@@ -419,11 +419,11 @@ trusted-host = 172.27.234.197
             pypi
             hosted
         [pypi]
-        repository=http://172.27.234.197:8082/nexus3/repository/pypi-public/pypi/
+        repository=http://172.27.234.197:8083/nexus3/repository/pypi-public/pypi/
         username=dev2
         password=Dev2Dev2
         [hosted]
-        repository=http://172.27.234.197:8082/nexus3/repository/pypi-hosted/
+        repository=http://172.27.234.197:8083/nexus3/repository/pypi-hosted/
         username=dev2
       password=Dev2Dev2
       ```
@@ -567,7 +567,7 @@ docker rmi xxx
 channels:
   - defaults
 default_channels:
-  - http://dev2:Dev2Dev2@172.27.234.197:8082/nexus3/repository/conda-public
+  - http://dev2:Dev2Dev2@172.27.234.197:8083/nexus3/repository/conda-public
 show_channel_urls: true
 ```
 

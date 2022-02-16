@@ -10,7 +10,7 @@ import pymysql
 
 __all__ = ['Connection', 'ConnectionPool', 'logger']
 
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)8s %(asctime)s: %(message)s', datefmt='%m-%d %H:%M:%S')
+# logging.basicConfig(level=logging.DEBUG, format='%(levelname)8s %(asctime)s: %(message)s', datefmt='%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 #logger.setLevel('WARNING')
 
@@ -77,6 +77,7 @@ class Connection(pymysql.connections.Connection):
                     cur.executemany(sql, args)
                 else:
                     cur.execute(sql, args)
+                self.commit()
             except Exception as e:
                 logger.error("error type:{%s}, error message: {%s}", e.__class__.__name__, e)
                 raise PoolException("query db failed")
