@@ -1,0 +1,17 @@
+version: "3.7"
+services:
+  prometheus:
+    image: prom/prometheus:v2.33.4
+    volumes:
+      - ~/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+  grafana:
+    image: grafana/grafana:8.4.3
+    volumes:
+      - ~/docker/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ~/docker/grafana/datasource.ini:/etc/grafana/provisioning/datasources/datasource.ini
+    ports:
+      - 3001:3000
+    links:
+      - prometheus
