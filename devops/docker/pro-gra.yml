@@ -10,8 +10,14 @@ services:
     image: grafana/grafana:8.4.3
     volumes:
       - ~/docker/grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ~/docker/grafana/datasource.ini:/etc/grafana/provisioning/datasources/datasource.ini
+      - ~/docker/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml
     ports:
       - 3001:3000
     links:
       - prometheus
+  node-exporter:
+    image: prom/node-exporter:v1.3.1
+    container_name: monitor_node_exporter
+    restart: unless-stopped
+    expose:
+     - 9100
