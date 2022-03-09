@@ -2,7 +2,7 @@ apiVersion: 1
 datasource:
   - name: Prometheus
     type: prometheus
-    url: http://wslhost:9090
+    url: http://prometheus:9090
     isDefault: true
     access: proxy
     editable: true
