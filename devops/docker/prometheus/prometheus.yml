@@ -17,5 +17,5 @@ scrape_configs:
     metrics_path: /metrics
     scheme: http
     static_configs:
-      - targets: ['wslhost:9090', 'node-exporter:9100']
+      - targets: ['wslhost:9090', 'wslhost:9100']
 
