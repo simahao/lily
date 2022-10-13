@@ -56,7 +56,7 @@ git clean -df
 如果想针对某一个文件，恢复到历史的某一次提交
 
 ```shell
-git restore -s hashid file.java
+git restore -s <commit-hash> file.java
 ```
 
 ## Recover a deleted file
@@ -97,3 +97,60 @@ git reset --hard HEAD~1
 ```
 
 ## Resurrect a deleted branch
+
+这个功能需要准确的找到被删除branch对应的最新的commit-hash，可以通过reflog中的提交日志找到一些线索
+
+```shell
+git branch -D fea
+git branch fea <commit-hash>
+```
+
+## Rewind/undo an erroneous commit
+
+提交一个commit后，发现有问题，需要回退，并且保留回退的痕迹，可以使用revert功能
+
+```shell
+git revert <commit-hash>
+```
+
+
+## Undo a Git Merge
+
+## Rollback to an older version
+
+如果想回退到之前的某个提交，可以使用reset命令，reset命令同revert命令不同，reset不会产生新的提交，而是回滚到之前的状态，另外reset命令可以控制回退本地仓库，stage区域，working tree区域。
+
+```shell
+git reset [--soft/--mixed(default)/--hard] <commit-hash>
+```
+
+* --soft: 只回退本地仓库
+* --mixed(default)：回退本地仓库和stage区域
+* --hard：回退本地仓库，stage区域，working tree
+
+## Modify an old commit message
+
+```shell
+git rebase -i <commit-hash>
+```
+
+* reword can modify an old commit message
+* squash can merge commits and combine messages
+* fixup can merge commits and use previous commit message
+* fixup -C can merge commits and use current commit message
+* fixup -c like fixup -C but open the editor
+
+## edit an old commit to add new change(s)
+
+```shell
+git rebase -i <commit-hash>
+```
+
+选择edit关键字
+
+```shell
+touch newfile
+git add newfile
+git commit --amend --no-edit
+git rebase --contine
+```
