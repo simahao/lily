@@ -34,7 +34,7 @@ Dcdr5VtvFI7K4g5UBe3dUFiD48BZKEgyt3/Y6/DDi56/6HtOvtSxBDnzCaw6WKY0
 BFvCmmPmkCcx1QWO5FxuUg23FBxDBQJjgeUdAhsMAAoJEFxuUg23FBxDL50L/0ls
 7iF9v5kCMDvq5FOB0mA7IvqjZAInkX2xicjIHQTyuqMHn1lUEVJRHOhAq1Chid1h
 7GkGAgqRqQ45Lq8OgM8egMcu9EsWHuTGqcRFkcqPw1dLUupYq+9qqN2B73S1qro9
-eBc6DeK0E8wp5Qm/yWY2XIXFdNt5XJSnWyEllRMnUiQoYx91QOVfH/yM8sAoBCpK
+eBc6DeK0E8wp5Qm/yWY2XIXFdNt5XJSnWyEllRMnUiQoYx91QOafH/yM8sAoBCpK
 J/uHYXyW8zgpjXUEsY5KZJWia5ycw/2L+vZpM8SL4Il7490mmzlvovCuu/CcCAR4
 v+bfAgML83phzzHqOdnT/01z622+HV9TXE/Ix+YoU3GGI+y1WVNq8EohorQbtVLO
 7eiFD1kzFca0vKc5LhUThtlizxwEAOanlx5OinkCBSxlI3ssyB41Qfr8tqi9Pr1A
@@ -43,91 +43,156 @@ RfC4l0JmcNoiXCI+tlhC3zMGiq4JJeISHQfuyKYZZSpgzi0fK/eU371lBLPipw==
 =0WOu
 -----END PGP PUBLIC KEY BLOCK-----"
 
+PRIVATE_KEY=""
+
 USER_ID='hz@hz.com'
 
 PUBLIC_ID="5BC29A63E6902731D5058EE45C6E520DB7141C43"
 
 SECRET_ID=""
 
+CUR_DIR=$(basename $(pwd))
+
 function encrypt() {
-    mvn clean
-    export i=0
-    for ext in "${EXT[@]}"; do
-        export ext
-        find . -name "*.${ext}" -exec sh -c 'f="{}"; mv -- "$f" "${f%.$ext}.log$i"' \;
-        i=$((i + 1))
-    done
-    tar -zcf log.tar.gz .
-    gpg --list-keys | grep -q $PUBLIC_ID
-    if [[ $? != 0 ]]; then
-        gpg --import <<EOF
-$PUBLIC_KEY
+
+    echo "open git bash, enter into project root path firstly"
+    read -p "project root path is [${CUR_DIR}], is it correct?(y/N) "
+
+    if [[ ${REPLY} == "y" ]]; then
+        echo "mvn clean for decreasing size"
+        mvn clean > /dev/null 2>&1
+        cd ..
+        # sh -c start sub shell environment, so variable should be exported
+        export i=0
+        for ext in "${EXT[@]}"; do
+            export ext
+            find ${CUR_DIR} -name "*.${ext}" -exec sh -c 'f="{}"; mv -- "$f" "${f%.${ext}}.log${i}"' \;
+            ((i=i + 1))
+        done
+        tar -zcf log.tar.gz ${CUR_DIR}
+        # gpg is whether installed or not
+        gpg --list-keys | grep -q ${PUBLIC_ID}
+        if [[ $? != 0 ]]; then
+            gpg --import <<EOF
+${PUBLIC_KEY}
 EOF
+        fi
+        gpg --encrypt --output log.gz --recipient ${USER_ID} log.tar.gz
+        echo "encrypted data is log.gz"
+        rm -rf log.tar.gz
     fi
-    gpg --encrypt --output log.gz --recipient $USER_ID log.tar.gz
 }
 
 
 function decrypt() {
 
-    gpg --list-secret-keys | grep -q $SECRET_ID
+    echo "script will decrypt log.gz"
+    gpg --list-secret-keys | grep -q ${SECRET_ID}
     if [[ $? != 0 ]]; then
         gpg --import <<EOF
-$SECRET_ID
+${SECRET_KEY}
 EOF
     fi
 
     # decrypt with gpg
-    gpg --decrypt --output log.tar.gz log.gz
-    rm -rf log.gz
+    gpg --decrypt --output log.tar.gz log.gz || exit 1
+
+    # get project root path
+    project_path=$(tar -ztf log.tar.gz | sed -n 1p)
+
+    echo "project path: ${project_path}"
+
     # unzip
-    tar -zxf log.tar.gz
+    tar -zxf log.tar.gz || exit 1
+
+    cd ${project_path}
+
     for file in $(find . -name "*.log*" -type f -print); do
         ext=${file##*.}
-        basename=${file%.*}
+        prefix=${file%.*}
         case $ext in
             log0)
-                mv $file ${basename}.java
+                mv ${file} ${prefix}.java
                 ;;
             log1)
-                mv $file ${basename}.json
+                mv ${file} ${prefix}.json
                 ;;
             log2)
-                mv $file ${basename}.yml
+                mv ${file} ${prefix}.yml
                 ;;
             log3)
-                mv $file ${basename}.md
+                mv ${file} ${prefix}.md
                 ;;
             log4)
-                mv $file ${basename}.js
+                mv ${file} ${prefix}.js
                 ;;
             log5)
-                mv $file ${basename}.yaml
+                mv ${file} ${prefix}.yaml
                 ;;
             log6)
-                mv $file ${basename}.xml
+                mv ${file} ${prefix}.xml
                 ;;
             log7)
-                mv $file ${basename}.properties
+                mv ${file} ${prefix}.properties
                 ;;
             log8)
-                mv $file ${basename}.MF
+                mv ${file} ${prefix}.MF
                 ;;
             log9)
-                mv $file ${basename}.sh
+                mv ${file} ${prefix}.sh
                 ;;
             *)
-                echo "$file is not supported"
+                echo "${file} is not supported"
                 ;;
         esac
     done
 }
 
-if [[ $1 == "e" ]]; then
-    encrypt
-elif [[ $1 == "d" ]]; then
-    decrypt
-else
-    echo "crypt e: encrypt data"
-    echo "crypt d: decrypt data"
-fi
+function usage() {
+    echo "NAME"
+    echo "        crypt: encrypt/decrypt project. Additionally, encrypt/decrypt only one project everytime"
+    echo "SYNOPSIS"
+    echo "        crypt [OPTIONS]"
+    echo "DESCRIPTION"
+    echo "        -h"
+    echo "            display help infomation"
+    echo "        -e"
+    echo "            encrypt mode: encrypt one java backend project which managemed by maven"
+    echo "        -d"
+    echo "            decrypt mode: decrypt one project"
+}
+
+# :h silent mode, print no error messages, error is handled by me
+while getopts ":hed" opt; do
+    case ${opt} in
+        h)
+            usage
+            exit 1
+            ;;
+        e)
+            encrypt
+            ;;
+        d)
+            decrypt
+            ;;
+        :)
+            echo "Error: -${OPTARG} requires an argument."
+            ;;
+        ?)
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+
+# find . -name "*.log0" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log0}.java"' \;
+# find . -name "*.log1" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log1}.json"' \;
+# find . -name "*.log2" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log2}.yml"' \;
+# find . -name "*.log3" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log3}.md"' \;
+# find . -name "*.log4" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log4}.js"' \;
+# find . -name "*.log5" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log5}.yaml"' \;
+# find . -name "*.log6" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log6}.xml"' \;
+# find . -name "*.log7" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log7}.properties"' \;
+# find . -name "*.log8" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log8}.MF"' \;
+# find . -name "*.log9" -exec sh -c 'f="{}"; mv -- "$f" "${f%.log9}.sh"' \;
