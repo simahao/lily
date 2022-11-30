@@ -148,7 +148,7 @@ function encrypt() {
         export i=0
         for ext in "${EXT[@]}"; do
             export ext
-            find "${CUR_DIR}" -name "*.${ext}" -exec sh -c 'f="$1"; mv -- "$f" "${f%.${ext}}.log${i}"' \;
+            find "${CUR_DIR}" -name "*.${ext}" -exec sh -c 'f="{}"; mv -- "$f" "${f%.${ext}}.log${i}"' \;
             ((i=i + 1))
         done
         tar -zcf log.tar.gz "${CUR_DIR}"
@@ -187,7 +187,7 @@ EOF
 
     cd "${project_path}" || exit 1
 
-    find . -name "*.log*" -type -f -print0 | while IFS= read -r -d '' file; do
+    find . -name "*.log*" -type f -print0 | while IFS= read -r -d '' file; do
         ext=${file##*.}
         prefix=${file%.*}
         case $ext in
