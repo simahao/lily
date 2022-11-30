@@ -133,12 +133,12 @@ PUBLIC_ID="5BC29A63E6902731D5058EE45C6E520DB7141C43"
 
 SECRET_ID="5BC29A63E6902731D5058EE45C6E520DB7141C43"
 
-CUR_DIR=$(basename $(pwd))
+CUR_DIR=$(basename "$(pwd)")
 
 function encrypt() {
 
     echo "open git bash, enter into project root path firstly"
-    read -p "project root path is [${CUR_DIR}], is it correct?(y/N) "
+    read -rp "project root path is [${CUR_DIR}], is it correct?(y/N) "
 
     if [[ ${REPLY} == "y" ]]; then
         echo "mvn clean for decreasing size"
@@ -148,13 +148,12 @@ function encrypt() {
         export i=0
         for ext in "${EXT[@]}"; do
             export ext
-            find ${CUR_DIR} -name "*.${ext}" -exec sh -c 'f="{}"; mv -- "$f" "${f%.${ext}}.log${i}"' \;
+            find "${CUR_DIR}" -name "*.${ext}" -exec sh -c 'f="$1"; mv -- "$f" "${f%.${ext}}.log${i}"' \;
             ((i=i + 1))
         done
-        tar -zcf log.tar.gz ${CUR_DIR}
+        tar -zcf log.tar.gz "${CUR_DIR}"
         # gpg is whether installed or not
-        gpg --list-keys | grep -q ${PUBLIC_ID}
-        if [[ $? != 0 ]]; then
+        if ! gpg --list-keys | grep -q "${PUBLIC_ID}"; then
             gpg --import <<EOF
 ${PUBLIC_KEY}
 EOF
@@ -169,10 +168,9 @@ EOF
 function decrypt() {
 
     echo "script will decrypt log.gz"
-    gpg --list-secret-keys | grep -q ${SECRET_ID}
-    if [[ $? != 0 ]]; then
+    if ! gpg --list-secret-keys | grep -q ${SECRET_ID}; then
         gpg --import <<EOF
-${SECRET_KEY}
+${PRIVATE_KEY}
 EOF
     fi
 
@@ -187,41 +185,41 @@ EOF
     # unzip
     tar -zxf log.tar.gz || exit 1
 
-    cd ${project_path}
+    cd "${project_path}" || exit 1
 
-    for file in $(find . -name "*.log*" -type f -print); do
+    find . -name "*.log*" -type -f -print0 | while IFS= read -r -d '' file; do
         ext=${file##*.}
         prefix=${file%.*}
         case $ext in
             log0)
-                mv ${file} ${prefix}.java
+                mv "${file}" "${prefix}".java
                 ;;
             log1)
-                mv ${file} ${prefix}.json
+                mv "${file}" "${prefix}".json
                 ;;
             log2)
-                mv ${file} ${prefix}.yml
+                mv "${file}" "${prefix}".yml
                 ;;
             log3)
-                mv ${file} ${prefix}.md
+                mv "${file}" "${prefix}".md
                 ;;
             log4)
-                mv ${file} ${prefix}.js
+                mv "${file}" "${prefix}".js
                 ;;
             log5)
-                mv ${file} ${prefix}.yaml
+                mv "${file}" "${prefix}".yaml
                 ;;
             log6)
-                mv ${file} ${prefix}.xml
+                mv "${file}" "${prefix}".xml
                 ;;
             log7)
-                mv ${file} ${prefix}.properties
+                mv "${file}" "${prefix}".properties
                 ;;
             log8)
-                mv ${file} ${prefix}.MF
+                mv "${file}" "${prefix}".MF
                 ;;
             log9)
-                mv ${file} ${prefix}.sh
+                mv "${file}" "${prefix}".sh
                 ;;
             *)
                 echo "${file} is not supported"
