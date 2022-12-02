@@ -9,6 +9,7 @@
   - [Npm](#npm)
     - [配置](#配置-1)
     - [下载与部署](#下载与部署-1)
+    - [修复nexus db](#修复nexus-db)
   - [Pypi](#pypi)
     - [配置](#配置-2)
     - [下载与部署](#下载与部署-2)
@@ -302,7 +303,7 @@ Nexus3的私有仓库管理类型主要三种：
 
     ```shell
     #!/bin/bash
-    
+
     find . -name "*.lastUpdated*" -print -exec rm -rf {} \;
     or
     find . -name "*.lastUpdated*" -print | xargs rm -rf
@@ -379,6 +380,27 @@ Nexus3的私有仓库管理类型主要三种：
 
   - 执行 ```npm publish```就可以发布到npm-hosted仓库，如果不修改package.json，每次需要执行```npm publish --registry=http://172.27.234.197:8083/nexus3/repository/npm-hosted```
 
+### 修复nexus db
+
+```shell
+rm -rf db/component/*.wal
+
+cd nexus3/lib/support
+
+java -jar nexus-orient-console.jar
+
+connect plocal:xxx/db/component admin admin
+
+repair database --fix-graph
+repair database --fix-links
+repiar database --fix-ridbags
+repair database --fix-bonsai
+rebuild index *
+disconnect
+exit
+```
+
+
 ## Pypi
 
 ### 配置
@@ -434,9 +456,9 @@ trusted-host = 172.27.234.197
 
         ```python
         import setuptools
-        
+
         readme = 'README.md'
-        
+
       setuptools.setup(
            name='pool',
          version='0.0.1',
@@ -452,7 +474,7 @@ trusted-host = 172.27.234.197
            packages=setuptools.find_packages()
         )
       ```
-      
+
     - 生成压缩包
 
         ```python setup.py sdist bdist_wheel```
@@ -661,7 +683,7 @@ nexus为大部分仓库提供了hosted、proxy、group模型，基本操作是�
         upstream nexus_docker_put {
             server 172.27.234.197:9072;
         }
-    
+
         server {
             listen       80;
             listen       443 ssl;
@@ -680,7 +702,7 @@ nexus为大部分仓库提供了hosted、proxy、group模型，基本操作是�
                 set $upstream "nexus_docker_get";
             }
             index index.html index.htm index.php;
-    
+
             location / {
                 proxy_pass http://$upstream;
                 proxy_set_header Host $host;
@@ -693,7 +715,7 @@ nexus为大部分仓库提供了hosted、proxy、group模型，基本操作是�
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Proto http;
             }
-    
+
     ```
 
 ### Tasks
