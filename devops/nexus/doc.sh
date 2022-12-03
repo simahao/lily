@@ -58,7 +58,7 @@ function usage() {
     echo "NAME"
     echo "        doc.sh  generate doc according to internet or intranet config"
     echo "SYNOPSIS"
-    echo "        syn.sh [OPTIONS]"
+    echo "        doc.sh [OPTIONS]"
     echo "DESCRIPTION"
     echo "        -h"
     echo "            display help infomation"
