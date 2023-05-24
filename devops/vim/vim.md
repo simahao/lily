@@ -130,7 +130,7 @@
     * s/S：删除光标所在字符，删除光标所在行
     * C：删除光标位置到行尾
   
-  *  copy/cut/paste
+  * copy/cut/paste
   
     * yy/Y：复制一行
     * [n]yy：复制n行
@@ -145,6 +145,7 @@
     * yas：复制一句话
     * p/P：在光标之后粘贴，在光标之前粘贴
     * cut：将y命令换成x，如xw，剪切一个单词，xG，当前行到文档末尾剪切掉
+    * :set paste：改命令可以实现格式化粘贴
   
   * search/replace
   
@@ -167,9 +168,12 @@
   
   * mark
   
-    * m[a-z]：标记光标所在位置，局部标记，只用于当前文件
-    * m[A-Z]：标记光标所在位置，全局标记。标记之后，退出Vim， 重新启动，标记仍然有效
+    * m[a-z]：标记光标所在位置
     * :marks：显示所有标记
+    * ‘[a-z]：跳转到标记处所在行
+    * `[a-z]：精确跳转到标记位置
+    * m[A-Z]：全局有效，实现不同文件跳转
+    * ^o：如果从A文件跳转到B文件， ^o可以实现从B文件返回A文件
   
   * undo/redo/repeat
   
@@ -182,7 +186,9 @@
   
   * lower/upper
   
-  * interactive with OS
+  * interacting with OS
+  
+    * :!pwd
   
   * split
   
