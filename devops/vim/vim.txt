@@ -26,3 +26,7 @@
     (23)g8 ga c-a c-x gf c-^ gq :set paste :colo
     (24)plugin（a nerdtree nerdcommentor ctrlp signature youcompleteme）
     (25)help（:h ctrl-v ^v i^v :helpgrep next* :cw）
+
+
+    https://blog.csdn.net/ch_improve/article/details/88706714?ydreferer=aHR0cHM6Ly93d3cuYmluZy5jb20v
+    https://zhuanlan.zhihu.com/p/68111471
