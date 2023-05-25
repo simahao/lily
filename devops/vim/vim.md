@@ -31,24 +31,23 @@
   "highlight CursorLine   cterm=NONE ctermbg=black ctermfg=NONE guibg=NONE guifg=NONE
   "highlight CursorColumn cterm=NONE ctermbg=black ctermfg=green guibg=NONE guifg=NONE
   
+  let g:Lf_ShortcutF = '<c-p>'
+  nnoremap <C-n> :NERDTree<CR>
+  
   " set the runtime path to include Vundle and initialize
   set rtp+=~/.vim/bundle/Vundle.vim
   call vundle#begin()
-  
   " let Vundle manage Vundle, required
   Plugin 'VundleVim/Vundle.vim'
-  
-  Plugin 'tpope/vim-fugitive'
-  Plugin 'git://git.wincent.com/command-t.git'
   Plugin 'elzr/vim-json'
-  Plugin 'kien/ctrlp.vim'
   Plugin 'plasticboy/vim-markdown'
   Plugin 'tpope/vim-surround'
-  Plugin 'vim-scripts/a.vim'
   Plugin 'flazz/vim-colorschemes'
-  
+  Plugin 'Yggdroot/LeaderF'
+  Plugin 'preservim/nerdtree'
   " All of your Plugins must be added before the following line
   call vundle#end()            " required
+  
   filetype plugin indent on    " required
   
   autocmd FileType java,shell,bash,cpp,html,cpp,vim,json setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
@@ -101,11 +100,10 @@
   
     * x%：x代表具体数字，定位百分比
   
-    * 扩展
+    * ()：句子开头结尾
   
-      * ()：句子开头结尾
-      * {}：段落开头结尾
-
+    * {}：段落开头结尾
+  
   * text object
 
     * aw：一个单词
@@ -116,7 +114,9 @@
   * edit
   
     * i/I：光标前插入，当前行行首插入
+    * 8i= esc：插入8个=
     * a/A：光标后增加，当前行行尾增加
+    * J：将下一行连接到当前行
     * o/O：当前行下面增加一行，当前行上面增加一行
     * d[n]w：删除一个（n个）单词
     * dti：删除字符直到i
@@ -144,7 +144,7 @@
     * yaw：复制一个单词
     * yas：复制一句话
     * p/P：在光标之后粘贴，在光标之前粘贴
-    * cut：将y命令换成x，如xw，剪切一个单词，xG，当前行到文档末尾剪切掉
+    * 剪切：将y命令换成x，如xw，剪切一个单词，xG，当前行到文档末尾剪切掉
     * :set paste：改命令可以实现格式化粘贴
   
   * search/replace
@@ -152,19 +152,28 @@
     * /：/keyword，在当前位置后面查找keyword
     * ?：?keyword，在当前位置之前查找keyword
     * n/N：向后、向前继续查找
-    * ?/old/new：用new替换当前行第一个old
-    * ?/old/new/g：用new替换当前行所有old
+    * *：查找单词
+    * %：跳转到匹配
+    * #：反向查找单词
+    * :.s/old/new：用new替换当前行第一个old
+    * :.s/old/new/g：用new替换当前行所有的old
+    * :.s/old/new/gi：用new替换当前行所有的old，忽略大小写
     * m,ns/old/new/g：从m行到n行，用new替换所有old
-    * %s/old/new/g：全文范围，用new替换old
-    * %s/^ xyz/dd：删除空格开头，后面是xyz的所有行
-    * %s/^/abc/g：所有行首添加abc
-    * %s/$/abc/g：所有行尾添加abc
+    * :%s/old/new/g：全文范围，用new替换old
+    * :%s/^ xyz/dd：删除空格开头，后面是xyz的所有行
+    * :%s/^/abc/g：所有行首添加abc
+    * :%s/$/abc/g：所有行尾添加abc
   
   * indent
   
     * shift+>：向右缩进
     * shift+<：向左缩进
     * .：重复执行
+  
+  * jump
+  
+    * ^o：如果从A文件跳转到B文件， ^o可以实现从B文件返回A文件，也可以是文件内跳转，例如mark功能
+    * ^i：和 ^o对应，互相切换
   
   * mark
   
@@ -173,9 +182,16 @@
     * ‘[a-z]：跳转到标记处所在行
     * `[a-z]：精确跳转到标记位置
     * m[A-Z]：全局有效，实现不同文件跳转
-    * ^o：如果从A文件跳转到B文件， ^o可以实现从B文件返回A文件
   
   * undo/redo/repeat
+  
+    * u：undo一次操作
+    * 3u：undo三次操作
+    * U：放弃当前行的修改
+    * c^r：redo一次
+    * .：重复上一次命令
+    * ;：重复[tTfF]
+    * ,：反向[tTfF]
   
   * file type
   
@@ -184,12 +200,46 @@
   
   * register
   
+    * "ayw：复制一个单词，放到寄存器a中
+    * "ap：将寄存器a中的值粘贴到当前光标之后
+  
   * lower/upper
+  
+    * guu：当前行小写
+    * gUU：当前行大写
+    * ~：一个字符一个字符改变大小写
+    * g~~：当前行改变大小写
+    * gU$：从光标位置到行尾大写 
+    * Vu：当前行小写
+    * VU：当前行大写
+    * ggguG：gg开头，G结尾，gu小写，从开头到结尾全部小写
+    * gggUG：gg开头，G结尾，gu小写，从开头到结尾全部大写
+    * 3guu：3行小写
   
   * interacting with OS
   
     * :!pwd
   
   * split
+  
+    * :split：上下切分窗口
+    * :vert split：左右切分窗口
+    * :res：上下窗口resize
+    * :vert res：左右窗口resize
+    * c^w[hjkl]：窗口间移动光标
+    * c^wc：关闭当前窗口
+  
+  * macro
+  
+    * q[a-z]：定义宏
+    * [n]@[a-z]：播放宏一次或者n次
+  
+  * help
+  
+    * :h gg：查看gg命令
+    * :h v_u：在可是模式下，使用u命令
+    * :h ctrl-v：
+    * :h magic：文本
+    * :h /[：正则表达式
   
     
