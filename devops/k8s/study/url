@@ -7,3 +7,12 @@ https://juejin.cn/post/7165777147959705608
 https://jasonkayzk.github.io/2021/05/30/%E5%9B%BD%E5%86%85%E5%9C%A8minikube%E4%B8%AD%E6%B7%BB%E5%8A%A0ingress-nginx%E6%8F%92%E4%BB%B6/
 
 https://zhuanlan.zhihu.com/p/549383610
+
+
+minikube addons enable ingress --images="KubeWebhookCertgenCreate=registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794,KubeWebhookCertgenPatch=registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794,IngressController=registry.k8s.io/ingress-nginx/controller:v1.7.0"
+
+--registries="IngressController=registry.cn-hangzhou.aliyuncs.com"
+
+
+minikube image load registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794
+minikube image load registry.k8s.io/ingress-nginx/controller:v1.7.0
