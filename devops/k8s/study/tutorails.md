@@ -6,7 +6,7 @@
 
 ```shell
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-sudo install minikube-linux-amd64 /usr/local/bin/minikube
+install minikube-linux-amd64 /usr/local/bin/minikube
 ```
 
 <https://minikube.sigs.k8s.io/docs/start/>
@@ -34,10 +34,27 @@ yum install docker-ce docker-ce-cli containerd.io
 
 ```shell
 curl -L -O "https://raw.githubusercontent.com/nullpo-head/wsl-distrod/main/install.sh"
-3.  chmod +x install.sh
-sudo ./install.sh install
+chmod +x install.sh
+./install.sh install
 /opt/distrod/bin/distrod enable --start-on-windows-boot
 /opt/distrod/bin/distrod enable
+```
+
+- iptabes&iptables-legacy
+
+```shell
+yum install iptabes*
+yum install iptables-legacy
+update-alternatives --config iptables
+```
+
+- system
+<https://pkgs.org/>
+
+```shell
+yum -y update
+yum groupinstall 'Development Tools'
+yum xauth
 ```
 
 - other
@@ -45,4 +62,23 @@ sudo ./install.sh install
 ```shell
 yum install bash-completion
 echo 'source <(kubectl completion bash)' >>~/.bashrc
+```
+
+
+- docker proxy
+
+```json
+{
+    "registry-mirrors": ["https://fbiqru8i.mirror.aliyuncs.com"]
+}
+```
+
+- minikuba addons
+
+```shell
+minikube addons enable ingress --images="KubeWebhookCertgenCreate=registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794,KubeWebhookCertgenPatch=registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794,IngressController=registry.k8s.io/ingress-nginx/controller:v1.7.0"
+
+--registries="IngressController=registry.cn-hangzhou.aliyuncs.com"
+minikube addons images dashboard | awk -F '|' '{print $2 $3 $4}' | sed '1,4d;$d'
+
 ```
