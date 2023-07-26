@@ -52,7 +52,8 @@ function statTwoBranch() {
         echo "branch2 is empty, please use lines.sh -b b1 b2"
         exit 1
     fi
-    maxLen=getMaxLenOfCommiter
+    getMaxLenOfCommiter
+    maxLen=$?
     maxLen=$((maxLen + 2))
     # log a..b=diff a...b
     # log a...b=diff a..b=diff a b
@@ -60,20 +61,22 @@ function statTwoBranch() {
     echo -e "\n\033[33mall contributors statistics after checkouting from $b2 in $b1:\033[0m"
     echo -e -n "\033[34m┌"
     c1=$maxLen
-    while $c1 -gt 0; do echo -n "─"; c1=$((c1 - 1)); done
+    while [[ $c1 -gt 0 ]]; do echo -n "─"; c1=$((c1 - 1)); done
     echo -e "┬─────────────┬───────────────┬─────────────┐"
 
     echo -n "|name"
     c2=$((maxLen - 4))
-    while $c2 -gt 0; do echo -e -n " "; c2=$((c2 - 1)); done
+    while [[ $c2 -gt 0 ]]; do echo -e -n " "; c2=$((c2 - 1)); done
     echo -e "| Added lines | Removed lines | Total lines |\033[0m"
 
-    git log --pretty='%aN' | sort -u | while read name; do git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%-${maxLen}s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", add, subs, loc }' -; done
+    #git log --pretty='%aN' | sort -u | while read name; do nameLen=$(echo -n $name | wc -c); spaceLen=$((maxLen - nameLen)); git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { space=sprintf("%*s","'$spaceLen'","");printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", space, add, subs, loc }' -; done
+    git log --pretty='%aN' | sort -u | while read name; do nameLenW=$(echo -n $name | wc -c);git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { nameLen=length("'$name'");if ("'$nameLenW'" > nameLen) spaceLen="'$maxLen'"-nameLen*2 else spaceLen="'$maxLen'"-nameLen;space=sprintf("%*s",spaceLen,"");printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", space, add, subs, loc }' -; done
     echo -e -n "\033[34m└"
     c1=$maxLen
-    while $c1 -gt 0; do echo -n -e "─"; c1=$((c1 - 1)); done
+    while [[ $c1 -gt 0 ]]; do echo -n -e "─"; c1=$((c1 - 1)); done
     echo -e "┴─────────────┴───────────────┴─────────────┘\033[0m"
 }
+
 
 function statLastestFromBegin() {
     echo -e "\n\033[33mall contributors statistics:\033[0m"
