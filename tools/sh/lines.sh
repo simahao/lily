@@ -70,7 +70,22 @@ function statTwoBranch() {
     echo -e "| Added lines | Removed lines | Total lines |\033[0m"
 
     #git log --pretty='%aN' | sort -u | while read name; do nameLen=$(echo -n $name | wc -c); spaceLen=$((maxLen - nameLen)); git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { space=sprintf("%*s","'$spaceLen'","");printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", space, add, subs, loc }' -; done
-    git log --pretty='%aN' | sort -u | while read name; do nameLenW=$(echo -n $name | wc -c);git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { nameLen=length("'$name'");if ("'$nameLenW'" > nameLen) spaceLen="'$maxLen'"-nameLen*2 else spaceLen="'$maxLen'"-nameLen;space=sprintf("%*s",spaceLen,"");printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", space, add, subs, loc }' -; done
+    # git log --pretty='%aN' | sort -u | while read name; do nameLenW=$(echo -n $name | wc -c);git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { nameLen=length("'$name'");if ("'$nameLenW'" > nameLen) spaceLen="'$maxLen'"-nameLen*2 else spaceLen="'$maxLen'"-nameLen;space=sprintf("%*s",spaceLen,"");printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", space, add, subs, loc }' -; done
+    readarray -t names <<< "$(git log --pretty='%aN' | sort -u)"
+
+    for name in "${names[@]}"; do
+        echo "aaa"
+        charLen=${#name}
+        byteLen=$(echo -n $name | wc  -c)
+        if [[ $charLen == $byteLen ]]; then
+            spaceLen=$((maxLen - charLen))
+            space=$(printf "%${spaceLen}s%" "")
+        else
+            diffLen=$((byteLen - charLen))
+            echo "aa“
+        fi
+    done
+
     echo -e -n "\033[34m└"
     c1=$maxLen
     while [[ $c1 -gt 0 ]]; do echo -n -e "─"; c1=$((c1 - 1)); done
