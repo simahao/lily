@@ -19,18 +19,21 @@ renamelimit=$(git config --get diff.renamelimit > /dev/null 2>&1)
 if [[ ${renamelimit} == "" ]]; then
     git config diff.renamelimit 9999999
 fi
-echo -e "\033[33m-------------------------"
-echo -e '| name    ':"$(git config --get user.name)"
-#echo 'remote url ':$(git config --get remote.origin.url)
-echo -e '| branch  ':"$(git symbolic-ref --short -q HEAD)"
-echo -e "-------------------------\033[0m"
 
+function metaInfo() {
+    echo -e "\033[33m-------------------------"
+    echo -e '| name    ':"$(git config --get user.name)"
+    #echo 'remote url ':$(git config --get remote.origin.url)
+    echo -e '| branch  ':"$(git symbolic-ref --short -q HEAD)"
+    echo -e "-------------------------\033[0m"
+}
 function getMaxLenOfCommiter() {
     readarray -t commiters <<< "$(git log --pretty='%aN' | sort -u | sort -nr -k1)"
     return $(echo "${commiters[0]}" | wc -c)
 }
 
 function statMe() {
+    metaInfo
     #time:16,added lines:13,removed lines:15,total lines:13
     echo -e "\033[34m┌────────────────┬─────────────┬───────────────┬─────────────┐\033[0m"
     echo -e "\033[34m|      Time      | Added lines | Removed lines | Total lines |\033[0m"
@@ -42,23 +45,18 @@ function statMe() {
     echo -e "\033[34m└────────────────┴─────────────┴───────────────┴─────────────┘\033[0m"
 }
 
-function statTwoBranch() {
-    read b1 b2 <<< "$1"
-    if [[ $b1 == "" ]]; then
-        echo "branch1 is empty, please use lines.sh -b b1 b2"
-        exit 1
-    fi
-    if [[ $b2 == "" ]]; then
-        echo "branch2 is empty, please use lines.sh -b b1 b2"
-        exit 1
-    fi
+function statCode() {
+    metaInfo
     getMaxLenOfCommiter
     maxLen=$?
     maxLen=$((maxLen + 2))
     # log a..b=diff a...b
     # log a...b=diff a..b=diff a b
-    echo "two branches are $b1..$b2"
-    echo -e "\n\033[33mall contributors statistics after checkouting from $b2 in $b1:\033[0m"
+    if [[ $1 == "twoBranch" ]]; then
+        echo -e "\n\033[33mall contributors statistics from $1:\033[0m"
+    elif [[ $1 == "fromBegin" ]]; then
+        echo -e "\n\033[33mall contributors statistics:\033[0m"
+    fi
     echo -e -n "\033[34m┌"
     c1=$maxLen
     while [[ $c1 -gt 0 ]]; do echo -n "─"; c1=$((c1 - 1)); done
@@ -69,8 +67,12 @@ function statTwoBranch() {
     while [[ $c2 -gt 0 ]]; do echo -e -n " "; c2=$((c2 - 1)); done
     echo -e "| Added lines | Removed lines | Total lines |\033[0m"
 
-    #git log --pretty='%aN' | sort -u | while read name; do nameLen=$(echo -n $name | wc -c); spaceLen=$((maxLen - nameLen)); git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { space=sprintf("%*s","'$spaceLen'","");printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", space, add, subs, loc }' -; done
-    # git log --pretty='%aN' | sort -u | while read name; do nameLenW=$(echo -n $name | wc -c);git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { nameLen=length("'$name'");if ("'$nameLenW'" > nameLen) spaceLen="'$maxLen'"-nameLen*2 else spaceLen="'$maxLen'"-nameLen;space=sprintf("%*s",spaceLen,"");printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", space, add, subs, loc }' -; done
+    echo -e -n "\033[34m└"
+    c1=$maxLen
+    while [[ $c1 -gt 0 ]]; do echo -n -e "─"; c1=$((c1 - 1)); done
+    echo -e "┴─────────────┴───────────────┴─────────────┘\033[0m"
+
+
     readarray -t names <<< "$(git log --pretty='%aN' | sort -u)"
 
     for name in "${names[@]}"; do
@@ -86,12 +88,16 @@ function statTwoBranch() {
             # hanziLen=(8-4)/2=2
             # engLen=4-2=2
             # spaceLen=12 - 2*2 - 2*1 = 6
-            hanziLen=$(((byteLen - charLen)/2))
+            hanziLen=$(((byteLen - charLen) / 2))
             engLen=$((charLen - hanziLen))
-            spaceLen=$((maxLen - hanziLen*2 - engLen))
+            spaceLen=$((maxLen - hanziLen * 2 - engLen))
         fi
-        space=$(printf "%*s\n" ${spaceLen} "")
-        git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", "'$space'", add, subs, loc }' -;
+        space="$(printf "%*s" ${spaceLen} "")"
+        if [[ $1 == "twoBranch" ]]; then
+            git log $2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk -v space="${space}" -v name="${name}" '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", name, space, add, subs, loc }' -;
+        else
+            git log --author="$name" --pretty=tformat: --numstat --no-merges | gawk -v space="${space}" -v name="${name}" '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", name, space, add, subs, loc }' -;
+        fi
     done
 
     echo -e -n "\033[34m└"
@@ -100,13 +106,18 @@ function statTwoBranch() {
     echo -e "┴─────────────┴───────────────┴─────────────┘\033[0m"
 }
 
-
-function statLastestFromBegin() {
-    echo -e "\n\033[33mall contributors statistics:\033[0m"
-    echo -e "\033[34m┌────────────────┬─────────────┬───────────────┬─────────────┐\033[0m"
-    echo -e "\033[34m|name            | Added lines | Removed lines | Total lines |\033[0m"
-    git log --pretty='%aN' | sort -u | while read name; do git log --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%-16s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", add, subs, loc }' -; done
-    echo -e "\033[34m└────────────────┴─────────────┴───────────────┴─────────────┘\033[0m"
+function usage() {
+    echo "usage: "
+    echo "  lines.sh -i"
+    echo "  lines.sh -a"
+    echo "  lines.sh -b master-tas..master"
+    echo ""
+    echo "required: "
+    echo "  -i                         statistic myself by period, e.g. 1 day or 1 week"
+    echo "  -a                         statistic all commiters from initiating repository"
+    echo "  -b <b1..b2|b1...b2>        two dots means: git log b1..b2 equals to git diff b1...b2, statistic all commits which only in b1 since b1 checkout from b2"
+    echo "                             three dots means: git log b1...b2 equals to git diff b1..b2, b1 checkout from b2, do some commits to b1 (1), do some commits to b2 (2), three dots means statistic all commits in (1) + (2)"
+    echo ""
 }
 
 while getopts "iab:" arg; do
@@ -115,17 +126,14 @@ while getopts "iab:" arg; do
             statMe
             ;;
         b)
-            statTwoBranch "$OPTARG"
+            statCode "twoBranch" "$OPTARG"
             ;;
         a)
-            statLastestFromBegin
+            statCode "fromBegin"
             ;;
         ?)
-            echo "wrong option, support i,a and b branch1 branch2"
+            usage
             exit 1
             ;;
     esac
 done
-
-
-
