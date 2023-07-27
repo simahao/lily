@@ -74,16 +74,24 @@ function statTwoBranch() {
     readarray -t names <<< "$(git log --pretty='%aN' | sort -u)"
 
     for name in "${names[@]}"; do
-        echo "aaa"
         charLen=${#name}
         byteLen=$(echo -n $name | wc  -c)
-        if [[ $charLen == $byteLen ]]; then
+        local space=""
+        if [[ ${charLen} == ${byteLen} ]]; then
             spaceLen=$((maxLen - charLen))
-            space=$(printf "%${spaceLen}s%" "")
         else
-            diffLen=$((byteLen - charLen))
-            echo "aa“
+            # note: byte length of one chinese is 3, width of one chinese is 2
+            # e.g.
+            # maxLen=12 name="汉字ab" byteLen=2*3+2=8 charLen=4
+            # hanziLen=(8-4)/2=2
+            # engLen=4-2=2
+            # spaceLen=12 - 2*2 - 2*1 = 6
+            hanziLen=$(((byteLen - charLen)/2))
+            engLen=$((charLen - hanziLen))
+            spaceLen=$((maxLen - hanziLen*2 - engLen))
         fi
+        space=$(printf "%*s\n" ${spaceLen} "")
+        git log $b1..$b2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", "'$name'", "'$space'", add, subs, loc }' -;
     done
 
     echo -e -n "\033[34m└"
