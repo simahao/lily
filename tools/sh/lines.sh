@@ -1,11 +1,13 @@
 #!/bin/bash
-#***********************************************
-# Utility of code statistic with git cmmmand,
+#*********************************************************
+# Utility of code count with git cmmmand,
 # support linux or git bash,not support windows
 # @author: simahao
-# @version 1.0
+# @version 1.1
 # @date 20190804
-#**********************************************
+# @date 20230728   1. support two branch
+#                  2. pretty cell alian for chinese name
+#*********************************************************
 
 if ! which git > /dev/null 2>&1; then
     echo "please install git"
@@ -21,18 +23,17 @@ if [[ ${renamelimit} == "" ]]; then
 fi
 
 function metaInfo() {
-    echo -e "\033[33m-------------------------"
-    echo -e '| name    ':"$(git config --get user.name)"
-    #echo 'remote url ':$(git config --get remote.origin.url)
-    echo -e '| branch  ':"$(git symbolic-ref --short -q HEAD)"
-    echo -e "-------------------------\033[0m"
+    echo -e "\033[33m-------------------------\033[0m"
+    echo -e "\033[33m| current user:$(git config --get user.name)"
+    echo -e "\033[33m| current branch:$(git symbolic-ref --short -q HEAD)"
+    echo -e "\033[33m-------------------------\033[0m"
 }
 function getMaxLenOfCommiter() {
     readarray -t commiters <<< "$(git log --pretty='%aN' | sort -u | sort -nr -k1)"
     return $(echo "${commiters[0]}" | wc -c)
 }
 
-function statMe() {
+function countMe() {
     metaInfo
     #time:16,added lines:13,removed lines:15,total lines:13
     echo -e "\033[34m┌────────────────┬─────────────┬───────────────┬─────────────┐\033[0m"
@@ -45,17 +46,22 @@ function statMe() {
     echo -e "\033[34m└────────────────┴─────────────┴───────────────┴─────────────┘\033[0m"
 }
 
-function statCode() {
+function countCode() {
     metaInfo
     getMaxLenOfCommiter
     maxLen=$?
+    if [[ ${maxLen} == 0 ]]; then
+        echo "no commiters are found in this repository"
+        exit 1
+    fi
     maxLen=$((maxLen + 2))
     # log a..b=diff a...b
     # log a...b=diff a..b=diff a b
+    # count commits in the branch1 which after checkouting from branch2
     if [[ $1 == "twoBranch" ]]; then
-        echo -e "\n\033[33mall contributors statistics from $1:\033[0m"
+        echo -e "\n\033[33mall contributors code counts from $1:\033[0m"
     elif [[ $1 == "fromBegin" ]]; then
-        echo -e "\n\033[33mall contributors statistics:\033[0m"
+        echo -e "\n\033[33mall contributors code counts since initiating repository:\033[0m"
     fi
     echo -e -n "\033[34m┌"
     c1=$maxLen
@@ -72,29 +78,32 @@ function statCode() {
     while [[ $c1 -gt 0 ]]; do echo -n -e "─"; c1=$((c1 - 1)); done
     echo -e "┴─────────────┴───────────────┴─────────────┘\033[0m"
 
-
+    # count code by every commiter
     readarray -t names <<< "$(git log --pretty='%aN' | sort -u)"
 
     for name in "${names[@]}"; do
+        # lenght of one chinese or english is 1
         charLen=${#name}
-        byteLen=$(echo -n $name | wc  -c)
+        # length of one chinese is 3, length of one english character is 1
+        byteLen=$(echo -n "$name" | wc  -c)
         local space=""
-        if [[ ${charLen} == ${byteLen} ]]; then
+        if [[ "${charLen}" == "${byteLen}" ]]; then
             spaceLen=$((maxLen - charLen))
         else
-            # note: byte length of one chinese is 3, width of one chinese is 2
+            # note: byte length of one chinese is 3, width of one chinese in screen is 2
             # e.g.
-            # maxLen=12 name="汉字ab" byteLen=2*3+2=8 charLen=4
-            # hanziLen=(8-4)/2=2
+            # maxLen=12 name="汉字ab" byteLen=2*3+2=8 charLen=4, screen width=2*2+2=6
+            # chineseLen=(8-4)/2=2
             # engLen=4-2=2
             # spaceLen=12 - 2*2 - 2*1 = 6
-            hanziLen=$(((byteLen - charLen) / 2))
-            engLen=$((charLen - hanziLen))
-            spaceLen=$((maxLen - hanziLen * 2 - engLen))
+            chineseLen=$(((byteLen - charLen) / 2))
+            engLen=$((charLen - chineseLen))
+            spaceLen=$((maxLen - chineseLen * 2 - engLen))
         fi
+        # spaceLen means maxLen - screen width(name), for alaining cell
         space="$(printf "%*s" ${spaceLen} "")"
         if [[ $1 == "twoBranch" ]]; then
-            git log $2 --author="$name" --pretty=tformat: --numstat --no-merges | gawk -v space="${space}" -v name="${name}" '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", name, space, add, subs, loc }' -;
+            git log "$2" --author="$name" --pretty=tformat: --numstat --no-merges | gawk -v space="${space}" -v name="${name}" '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", name, space, add, subs, loc }' -;
         else
             git log --author="$name" --pretty=tformat: --numstat --no-merges | gawk -v space="${space}" -v name="${name}" '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", name, space, add, subs, loc }' -;
         fi
@@ -110,26 +119,54 @@ function usage() {
     echo "usage: "
     echo "  lines.sh -i"
     echo "  lines.sh -a"
-    echo "  lines.sh -b master-tas..master"
+    echo "  lines.sh -b master-tas..master or lines.sh master-tas...master"
     echo ""
     echo "required: "
-    echo "  -i                         statistic myself by period, e.g. 1 day or 1 week"
-    echo "  -a                         statistic all commiters from initiating repository"
-    echo "  -b <b1..b2|b1...b2>        two dots means: git log b1..b2 equals to git diff b1...b2, statistic all commits which only in b1 since b1 checkout from b2"
-    echo "                             three dots means: git log b1...b2 equals to git diff b1..b2, b1 checkout from b2, do some commits to b1 (1), do some commits to b2 (2), three dots means statistic all commits in (1) + (2)"
+    echo "  -i                    count myself by period, e.g. 1 day or 1 week"
+    echo "  -a                    count all commiters from initiating repository"
+    echo "  -b <parent-branch..chinld-branch|parent-branch...child-branch>"
+    echo "  -b <commit1..commit2|commit1...commit2>"
+    echo "  -c <parent-branch..chinld-branch|parent-branch...child-branch>"
+    echo "  -c <commit1..commit2|commit1...commit2>"
+    echo "                        two dots means git log b1..b2, it equals to git diff b1...b2(three dots),"
+    echo "                        count all commits which only in b2 since b2 checkout from b1"
+    echo "                        three dots means git log b1...b2, it equals to git diff b1..b2(two dots),"
+    echo "                        after b1 checkout from b2, do some commits to b1 (1), do some commits to b2 (2),"
+    echo "                        git log b1...b2(three dots) means count all commits in (1) + (2)"
+    echo "  e.g."
+    echo "                        A0 <- A1 <- A2 <- A3 (master)"
+    echo "                        \\"
+    echo "                         C0 <- C1 (test)"
+    echo "                        "
+    echo "                        $ git log master..test"
+    echo "                        # result:C0 C1"
+    echo "                        "
+    echo "                        $ git log ^master test"
+    echo "                        # result: C0 C1"
+    echo "                        # lines.sh don't support ^master test for parsing input argument"
+    echo "                        "
+    echo "                        $ git log master…test"
+    echo "                        # result: A1 A2 A3 C0 C1"
+    echo "                        "
+    echo "                        origin..HEAD: What did I do since I forked from the origin branch"
+    echo "                        HEAD..origin: What did the origin do since I forked from them"
     echo ""
 }
 
-while getopts "iab:" arg; do
+while getopts "iahb:c:" arg; do
     case $arg in
         i)
-            statMe
+            countMe
             ;;
-        b)
-            statCode "twoBranch" "$OPTARG"
+        b|c)
+            countCode "twoBranch" "$OPTARG"
             ;;
         a)
-            statCode "fromBegin"
+            countCode "fromBegin"
+            ;;
+        h)
+            usage
+            exit 0
             ;;
         ?)
             usage
