@@ -140,7 +140,7 @@ function usage() {
     echo "                        three dots means git log b1...b2, it equals to git diff b1..b2(two dots),"
     echo "                        after b1 checkout from b2, do some commits to b1 (1), do some commits to b2 (2),"
     echo "                        git log b1...b2(three dots) means count all commits in (1) + (2)"
-    echo "  e.g."
+    echo "                  e.g."
     echo "                        A0 -> A1 -> A2 -> A3 (master)"
     echo "                        \\"
     echo "                         C0 -> C1 (test)"
