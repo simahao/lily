@@ -28,9 +28,32 @@ function metaInfo() {
     echo -e "\033[33m| current branch:$(git symbolic-ref --short -q HEAD)"
     echo -e "\033[33m-------------------------\033[0m"
 }
+
+declare -A commiterMap
 function getMaxLenOfCommiter() {
-    readarray -t commiters <<< "$(git log --pretty='%aN' | sort -u | sort -nr -k1)"
-    return $(echo "${commiters[0]}" | wc -c)
+    readarray -t commiters <<< "$(git log --pretty='%aN' | sort -u)"
+    maxLen=0
+    for commiter in "${commiters[@]}"; do
+        # lenght of one chinese or english is 1
+        charLen=${#commiter}
+        # length of one chinese is 3, length of one english character is 1
+        byteLen=$(echo -n "$commiter" | wc -c)
+        if [[ "${charLen}" == "${byteLen}" ]]; then
+            commiterMap["${commiter}"]=${charLen}
+        else
+            # note: byte length of one chinese is 3, width of one chinese in screen is 2
+            # e.g.
+            # maxLen=12 name="汉字ab" byteLen=2*3+2=8 charLen=4, screen width=2*2+2=6
+            # chineseLen=(8-4)/2=2
+            chineseLen=$(((byteLen - charLen) / 2))
+            engLen=$((charLen - chineseLen))
+            commiterMap["${commiter}"]=$((chineseLen * 2 + engLen))
+        fi
+        if [[ ${commiterMap["${commiter}"]} -gt ${maxLen} ]]; then
+            maxLen=${commiterMap["${commiter}"]}
+        fi
+    done
+    return ${maxLen}
 }
 
 function countMe() {
@@ -82,25 +105,8 @@ function countCode() {
     readarray -t names <<< "$(git log --pretty='%aN' | sort -u)"
 
     for name in "${names[@]}"; do
-        # lenght of one chinese or english is 1
-        charLen=${#name}
-        # length of one chinese is 3, length of one english character is 1
-        byteLen=$(echo -n "$name" | wc  -c)
-        local space=""
-        if [[ "${charLen}" == "${byteLen}" ]]; then
-            spaceLen=$((maxLen - charLen))
-        else
-            # note: byte length of one chinese is 3, width of one chinese in screen is 2
-            # e.g.
-            # maxLen=12 name="汉字ab" byteLen=2*3+2=8 charLen=4, screen width=2*2+2=6
-            # chineseLen=(8-4)/2=2
-            # engLen=4-2=2
-            # spaceLen=12 - 2*2 - 2*1 = 6
-            chineseLen=$(((byteLen - charLen) / 2))
-            engLen=$((charLen - chineseLen))
-            spaceLen=$((maxLen - chineseLen * 2 - engLen))
-        fi
         # spaceLen means maxLen - screen width(name), for alaining cell
+        spaceLen=$((maxLen - commiterMap["${name}"]))
         space="$(printf "%*s" ${spaceLen} "")"
         if [[ $1 == "twoBranch" ]]; then
             git log "$2" --author="$name" --pretty=tformat: --numstat --no-merges | gawk -v space="${space}" -v name="${name}" '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "\033[34m|%s%s|\033[0m \033[32m%11s\033[0m \033[34m|\033[0m \033[31m%13s\033[0m \033[34m|\033[0m \033[35m%11s\033[0m \033[34m|\033[0m\n", name, space, add, subs, loc }' -;
