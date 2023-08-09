@@ -5,7 +5,7 @@ function pull_docker_image() {
     mirror_img=$(echo "${k8s_img}" | sed 's/quay\.io/quay.dockerproxy.com/g;s/ghcr\.io/ghcr.dockerproxy.com/g;s/registry\.k8s\.io/k8s.dockerproxy.com/g;s/k8s\.gcr\.io/k8s.dockerproxy.com/g;s/gcr\.io/gcr.dockerproxy.com/g;s/docker\.io/dockerproxy.com/g')
 
     if [[ "${k8s_img}" == "${mirror_img}" ]]; then
-        sodu docker pull "${k8s_img}"
+        sodo docker pull "${k8s_img}"
     else
         sudo docker pull "${mirror_img}"
         sudo docker tag "${mirror_img}" "${k8s_img}"

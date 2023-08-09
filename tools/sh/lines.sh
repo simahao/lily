@@ -2,10 +2,10 @@
 #*********************************************************
 # Utility of code count with git cmmmand,
 # support linux or git bash,not support windows
-# @author: simahao
+# @author: zhanghao
 # @version 1.1
 # @date 20190804
-# @date 20230728   1. support two branch
+# @date 20230728   1. support statistic of two branch
 #                  2. pretty cell alian for chinese name
 #*********************************************************
 
@@ -129,34 +129,34 @@ function usage() {
     echo "  lines.sh -c commit1..commit2 or lines.sh -c commit1...commit2"
     echo ""
     echo "required: "
-    echo "  -i                    count myself by period, e.g. 1 day or 1 week"
-    echo "  -a                    count all commiters from initiating repository"
+    echo "  -i           count myself by period, e.g. 1 day or 1 week"
+    echo "  -a           count all commiters from initiating repository"
     echo "  -b <parent-branch..chinld-branch|parent-branch...child-branch>"
     echo "  -b <commit1..commit2|commit1...commit2>"
     echo "  -c <parent-branch..chinld-branch|parent-branch...child-branch>"
     echo "  -c <commit1..commit2|commit1...commit2>"
-    echo "                        two dots means git log b1..b2, it equals to git diff b1...b2(three dots),"
-    echo "                        count all commits which only in b2 since b2 checkout from b1"
-    echo "                        three dots means git log b1...b2, it equals to git diff b1..b2(two dots),"
-    echo "                        after b1 checkout from b2, do some commits to b1 (1), do some commits to b2 (2),"
-    echo "                        git log b1...b2(three dots) means count all commits in (1) + (2)"
-    echo "                  e.g."
-    echo "                        A0 -> A1 -> A2 -> A3 (master)"
-    echo "                        \\"
-    echo "                         C0 -> C1 (test)"
-    echo "                        "
-    echo "                        $ git log master..test"
-    echo "                        # result:C0 C1"
-    echo "                        "
-    echo "                        $ git log ^master test"
-    echo "                        # result: C0 C1"
-    echo "                        # lines.sh don't support ^master test for parsing input argument"
-    echo "                        "
-    echo "                        $ git log master…test"
-    echo "                        # result: A1 A2 A3 C0 C1"
-    echo "                        "
-    echo "                        origin..HEAD: What did I do since I forked from the origin branch"
-    echo "                        HEAD..origin: What did the origin do since I forked from them"
+    echo "               two dots means git log b1..b2, it equals to git diff b1...b2(three dots),"
+    echo "               count all commits which only in b2 since b2 checkout from b1"
+    echo "               three dots means git log b1...b2, it equals to git diff b1..b2(two dots),"
+    echo "               after b1 checkout from b2, do some commits to b1 (1), do some commits to b2 (2),"
+    echo "               git log b1...b2(three dots) means count all commits in (1) + (2)"
+    echo "           e.g."
+    echo "               A0 -> A1 -> A2 -> A3 (master)"
+    echo "               \\"
+    echo "                C0 -> C1 (test)"
+    echo "               "
+    echo "               $ git log master..test"
+    echo "               # result:C0 C1"
+    echo "               "
+    echo "               $ git log ^master test"
+    echo "               # result: C0 C1"
+    echo "               # lines.sh don't support ^master test for parsing input argument"
+    echo "               "
+    echo "               $ git log master…test"
+    echo "               # result: A1 A2 A3 C0 C1"
+    echo "               "
+    echo "               origin..HEAD: What did I do since I forked from the origin branch"
+    echo "               HEAD..origin: What did the origin do since I forked from them"
     echo ""
 }
 
