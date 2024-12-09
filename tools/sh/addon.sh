@@ -1,16 +1,21 @@
 #!/bin/bash
 
+MIRROR="kubesre.xyz"
 function pull_docker_image() {
     k8s_img=$1
-    mirror_img=$(echo "${k8s_img}" | sed 's/quay\.io/quay.dockerproxy.com/g;s/ghcr\.io/ghcr.dockerproxy.com/g;s/registry\.k8s\.io/k8s.dockerproxy.com/g;s/k8s\.gcr\.io/k8s.dockerproxy.com/g;s/gcr\.io/gcr.dockerproxy.com/g;s/docker\.io/dockerproxy.com/g')
+    mirror_img=${MIRROR}/$1
+    docker pull "${mirror_img}"
+    docker tag "${mirror_img}" "${k8s_img}"
+    docker rmi "${mirror_img}"
+    # mirror_img=$(echo "${k8s_img}" | sed 's/quay\.io/quay.dockerproxy.com/g;s/ghcr\.io/ghcr.dockerproxy.com/g;s/registry\.k8s\.io/k8s.dockerproxy.com/g;s/k8s\.gcr\.io/k8s.dockerproxy.com/g;s/gcr\.io/gcr.dockerproxy.com/g;s/docker\.io/dockerproxy.com/g')
 
-    if [[ "${k8s_img}" == "${mirror_img}" ]]; then
-        sodo docker pull "${k8s_img}"
-    else
-        sudo docker pull "${mirror_img}"
-        sudo docker tag "${mirror_img}" "${k8s_img}"
-        sudo docker rmi "${mirror_img}"
-    fi
+    # if [[ "${k8s_img}" == "${mirror_img}" ]]; then
+    #     sodo docker pull "${k8s_img}"
+    # else
+    #     sudo docker pull "${mirror_img}"
+    #     sudo docker tag "${mirror_img}" "${k8s_img}"
+    #     sudo docker rmi "${mirror_img}"
+    # fi
 }
 
 addon=$1
