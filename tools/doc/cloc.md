@@ -2,11 +2,12 @@
 
 业务产品部（zhanghao）
 
-| 版本 | 备注                                                         | 日期       |
-| ---- | ------------------------------------------------------------ | ---------- |
+| 版本 | 备注                                                         |    日期    |
+| :--: | ------------------------------------------------------------ | :--------: |
 | 1.0  | 初始版本，包括安装、基本命令格式、常用参数、使用场景         | 2024/11/25 |
-| 1.1  | 添加支持PL/SQL的bdy后缀的统计方案                            | 2024/11/26 |
-| 1.2  | 1. git合并其他人代码后，删除本地分支，如何统计的方案<br />2. --git场景说明<br />3. 目录对比、压缩文件对比的说明<br />4. 超时处理<br />5. git管理的文件，文件名是utf-8格式<br />6. cloc的限制说明 | 2024/11/27 |
+| 1.1  | 场景描述中，增加<br />1. 支持PL/SQL的bdy后缀的统计方案       | 2024/11/26 |
+| 1.2  | 在场景描述中，增加<br />1. git合并其他人代码后，删除本地分支，如何统计的方案<br />2. --git场景说明<br />3. 目录对比、压缩文件对比的说明<br />4. 超时处理<br />5. git管理的文件，文件名是utf-8格式<br />6. cloc的限制说明 | 2024/11/27 |
+| 1.3  | 在场景描述中，增加<br />1. 针对2.03版本的说明<br />2. 添加正则匹配的说明<br />3. 添加哪些文件会被忽略 | 2024/12/11 |
 
 
 
@@ -143,7 +144,32 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
 
 ## 使用场景
 
-1. 统计过程提示超时错误👿
+1. 2.02版本和2.03版本的说明
+
+   2.02版本是2024/8/3日发布的，这个版本存在已知的2个问题
+
+   - 不能识别PL/SQL中的bdy文件（2.02版本的处理方案参照后续场景的说明）
+   - 针对bdy文件和vue文件，如果同一行包含代码和注释，错误的按照注释进行统计
+
+   2.03版本解决了这些问题，建议使用2.03版本，由于windows的可执行文件要跟随发布才能提供出来，因此建议使用linux下的cloc，仓库会实时更新，cloc位于仓库的根目录下 [AlDanial/cloc](https://github.com/AlDanial/cloc)
+
+   
+
+2. 哪些文件会被忽略
+
+   如果文件的md5值一致，cloc会保留一个文件进行统计，可以关注cloc的统计结果，下面的例子中，cloc统计的2个txt文件，md5相同，cloc认为是一个文件，输出结果也只有一个文件，可以通过`--by-file`查看统计的明细
+
+   ```bash
+   ❯ cloc --by-file .
+          2 text files.
+          1 unique file.
+          2 files ignored.
+   
+   ```
+
+   
+
+3. 统计过程提示超时错误👿
 
    ```bash
    error: exceeded timeout
@@ -167,7 +193,7 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
 
    
 
-2. git管理，文件名称为中文utf-8格式，导致cloc运行失败💣
+4. git管理，文件名称为中文utf-8格式，导致cloc运行失败💣
 
    ```bash
    fatal: pathspec '\344\244\223\475.sql' did not match any path
@@ -189,7 +215,7 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
 
    
 
-3. cloc的输入如果是git target，可能会提示错误😓
+5. cloc的输入如果是git target，可能会提示错误😓
 
    ```bash
    cloc --diff 1.3.0 1.4.0
@@ -208,7 +234,7 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
    cloc --git-diff-rel commit1 commit2
    ```
 
-4. 对比目录、压缩文件🚛
+6. 对比目录、压缩文件🚛
 
    ```bash
    # 如果是全新建立的工程，不需要对比，直接统计目录下的代码即可
@@ -223,7 +249,7 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
 
    
 
-5. **排除掉cloc运行目录下的某一个目录或者多个目录**📇
+7. **排除掉cloc运行目录下的某一个目录或者多个目录**📇
 
    ```bash
    |-- .git
@@ -244,7 +270,7 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
 
    `--exclude-dir`不能排除多级目录，如`tmp/subdir`，这种需求需要通过`--fullpath --not-match-d`实现
 
-6. **排除测试代码**🍭
+8. **排除测试代码**🍭
 
    ```bash
    cloc --diff --not-match-d=test commit1 commit2
@@ -252,7 +278,7 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
    cloc --diff --full-path --not-match-f="test/.*/.*Test\.java" commit1 commit2
    ```
 
-7. **统计测试代码**🧁
+9. **统计测试代码**🧁
 
    ```bash
    cloc --diff --match-d=".*/test" commit1 commit2
@@ -274,55 +300,90 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
    cloc --diff --include-ext=java --match-d="test" commit1 commit2
    ```
 
-8. **如何统计PL/SQL中的bdy文件**🛠️
+10. 关于匹配目录的正则表达式
 
-   cloc-2.02之前的版本默认不能支持bdy后缀，同时统计bdy文件的代码时，如果一行当中既有代码也有注释，cloc-2.02版本按照注释统计，因此，可以使用2.03版本，如果要使用2.02版本，可以使用`--force-lang`参数处理
-   
-   **方案1**
-   
-   ```bash
-   cloc --force-lang='sql,bdy' a.bdy
-   
-          1 text file.
-          1 unique file.
-          0 files ignored.
-   
-   github.com/AlDanial/cloc v 2.02  T=0.02 s (45.0 files/s, 374572.6 lines/s)
-   --------------------------------------------------------------------------------------
-   Language                            files          blank        comment           code
-   --------------------------------------------------------------------------------------
-   Oracle PL/SQL Body Files                1            371           2414           5541
-   --------------------------------------------------------------------------------------
-   ```
-   
-   **方案2**是通过脚本先更新文件后缀，然后用默认的```bod```后缀进行统计
-   
-   在需要统计代码的目录下，通过cmd方式执行如下代码
-   
-   ```cmd
-   for /r %i in (*.bdy) do ren "%i" "%~ni.bod"
-   ```
-   
-   ```bash
-   cloc dir1
-        101 text files.
-        100 unique files.
-          5 files ignored.
-   
-   github.com/AlDanial/cloc v 2.02  T=0.46 s (217.3 files/s, 643646.4 lines/s)
-   -------------------------------------------------------------------------------
-   Language                     files          blank        comment           code
-   -------------------------------------------------------------------------------
-   Oracle PL/SQL                   99          22324         102973         170583
-   SQL                              1            115             14            206
-   -------------------------------------------------------------------------------
-   SUM:                           100          22439         102987         170789
-   -------------------------------------------------------------------------------
-   ```
-   
-   
-   
-9. **针对历史项目，已经合并入master，且本地分支删除，如何统计？**🏋️‍♂️
+   * 多目录匹配
+
+     ```bash
+     # 不统计当前目录下，包含test、abc字样的目录下的代码
+     # 如果目录是atest，test1，abcd，都会排除
+     cloc --diff --git --not-match-d="(test|abc)" commit1 commit2
+     cloc --diff --git --not-match_d="test" --not--match-d="abc" commit1 commit2
+     cloc --diff --git --fullpath --not-match-d=".*/test" commit1 commit2
+     ```
+
+     如果我只想匹配test目录
+
+     ```bash
+     cloc --diff --git --fullpath --not-match-d=".*/test$" commit1 commit2
+     ```
+
+   * 多文件匹配
+
+     ```bash
+     # 排除txt和md文件
+     # \.代表文字的.，这里也可以不加\，单独用.来匹配任意字符，也就包含了文字的.
+     cloc --diff --git --not-match-f="(.*\.txt|.*\.md)" commit1 commit2
+     ```
+
+     由于正则匹配需要保证表达式正确，因此**特别建议**将统计的明细进行打印确认，我们可以利用两个参数，分别是`--by-file`，`--by-file-by-lang`，这两个参数会打印所有的统计文件明细
+
+     ```bash
+     cloc --diff --git --by-file --not-match_d="test" commit1 commit2
+     cloc --diff --git --by-file-by-lang --not-match_d="test" commit1 commit2
+     ```
+
+     
+
+11. **如何统计PL/SQL中的bdy文件**🛠️
+
+    cloc-2.02之前的版本默认不能支持bdy后缀，同时统计bdy文件的代码时，如果一行当中既有代码也有注释，cloc-2.02版本按照注释统计，因此，可以使用2.03版本，如果要使用2.02版本，可以使用`--force-lang`参数处理
+
+    **方案1**
+
+    ```bash
+    cloc --force-lang='sql,bdy' a.bdy
+    
+           1 text file.
+           1 unique file.
+           0 files ignored.
+    
+    github.com/AlDanial/cloc v 2.02  T=0.02 s (45.0 files/s, 374572.6 lines/s)
+    --------------------------------------------------------------------------------------
+    Language                            files          blank        comment           code
+    --------------------------------------------------------------------------------------
+    Oracle PL/SQL Body Files                1            371           2414           5541
+    --------------------------------------------------------------------------------------
+    ```
+
+    **方案2**是通过脚本先更新文件后缀，然后用默认的```bod```后缀进行统计
+
+    在需要统计代码的目录下，通过cmd方式执行如下代码
+
+    ```cmd
+    for /r %i in (*.bdy) do ren "%i" "%~ni.bod"
+    ```
+
+    ```bash
+    cloc dir1
+         101 text files.
+         100 unique files.
+           5 files ignored.
+    
+    github.com/AlDanial/cloc v 2.02  T=0.46 s (217.3 files/s, 643646.4 lines/s)
+    -------------------------------------------------------------------------------
+    Language                     files          blank        comment           code
+    -------------------------------------------------------------------------------
+    Oracle PL/SQL                   99          22324         102973         170583
+    SQL                              1            115             14            206
+    -------------------------------------------------------------------------------
+    SUM:                           100          22439         102987         170789
+    -------------------------------------------------------------------------------
+    ```
+
+    
+
+12. **针对历史项目，已经合并入master，且本地分支删除，如何统计？**🏋️‍♂️
 
    针对历史项目（已经上线），本项目的代码，在合并进入master前，通常会合并其他项目或者生产变更代码之后再进入master，项目上线后，将本地分支删除（包括远程的该分支）。这种场景下，如果要统计代码，如何处理？总体来看，可以参考一下思路
 
@@ -436,7 +497,7 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
    private String clientName; #客户姓名
    ```
 
-   
+   2.02版本，针对bdy和vue后缀文件有缺陷，因此要使用2.03版本
 
 2. 内嵌的语言不会被统计，比如说HTML中包含了JavaScript，那么JavaScript统一按照HTML统计
 
