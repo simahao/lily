@@ -323,12 +323,12 @@ Usage: cloc.exe [options] <file(s)/dir(s)/git hash(es)> | <set 1> <set 2> | <rep
      cloc --diff --git --fullpath --not-match-d=".*/test$" commit1 commit2
      ```
 
-   * 多文件匹配
+     再给一个复杂的例子
+
+     如果全路径中，我们想排除node_modules、target、txa、txb、txc目录，不匹配csv、md、json文件，将结果输出到report.txt中
 
      ```bash
-     # 排除txt和md文件
-     # \.代表文字的.，这里也可以不加\，单独用.来匹配任意字符，也就包含了文字的.
-     cloc --diff --git --not-match-f=".*\.(txt|md)" commit1 commit2
+     cloc --fullpath --not-match-d='/(node_modules|target|tx[abc])/' --not-match-f='.*\.(csv|md|json)' --report-file=report.txt
      ```
 
      由于正则匹配需要保证表达式正确，因此**特别建议**将统计的明细进行打印确认，我们可以利用两个参数，分别是`--by-file`，`--by-file-by-lang`，这两个参数会打印所有的统计文件明细
