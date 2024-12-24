@@ -31,25 +31,29 @@ function convertmd_with_image() {
 
   # Loop through each Markdown file in the current directory
   for file in *.md; do
-    counter=0
+    local counter=0
     # Extract mermaid code blocks and convert them to images
     sed -n '/```mermaid/,/```/p' "$file" | while read -r line; do
       if [[ $line == '```mermaid' ]]; then
-        mermaid=""
+        local mermaid=""
       elif [[ $line == '```' ]]; then
-        if [[ "${mermaid}" =~ "\`\`\`mermaid\n*\`\`\`" ]]; then
-          echo "Error: Empty mermaid code block found in $file"
-          break
-        fi
         # Generate a unique filename for each diagram
-        filename="${file%.md}_$((counter++)).png"
+        local filename="${file%.md}_$((counter++)).png"
         echo -e "${mermaid}" | mmdc -i - -o "$filename"
-        # Replace the mermaid code block with the image link in the markdown file
-        sed -i "/\`\`\`mermaid/,/\`\`\`/c\\![Mermaid Diagram]($filename)" "$file"
       else
         mermaid="${mermaid}\n${line}"
       fi
     done
+    # Check if any PNG files were generated
+    if ls *.png >/dev/null 2>&1; then
+      # Replace the mermaid code block with the image link in the markdown file
+      sed -i '/```mermaid/,/```/c\\![mermaid diagram](?)' $file
+      lines=($(grep -n '\!\[mermaid diagram\](?)' $file | cut -d: -f1))
+      counter=0
+      for line in "${lines[@]}"; do
+        sed -i "${line}s/(?)/(test_$((counter++))).png/" $file
+      done
+    fi
   done
 }
 
