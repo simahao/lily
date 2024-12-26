@@ -15,7 +15,7 @@ function usage() {
 
 function check_dependencies() {
   for cmd in "$@"; do
-    which "$cmd" >/dev/null 2>&1 || { echo "Error: $cmd is not installed. Please install it before running this script."; exit 1; }
+    which "$cmd" >/dev/null 2>&1 || { echo "Error: $cmd is not installed. Please install it before running this script.\nmmdc:npm install -g @mermaid-js/mermaid-cli"; exit 1; }
   done
 }
 
